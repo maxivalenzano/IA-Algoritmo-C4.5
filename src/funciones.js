@@ -1,9 +1,9 @@
-export const listadoColumnas = (datos) => {
+export const listadoTituloColumnas = (datos) => {
   return Object.keys(datos[0]);
 };
 
 export const nombreClase = (datos) => {
-  const columnas = listadoColumnas(datos)
+  const columnas = listadoTituloColumnas(datos)
   return columnas[columnas.length-1]
 };
 
