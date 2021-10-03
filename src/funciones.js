@@ -5,9 +5,9 @@ export const listadoTituloColumnas = (datos) => {
 };
 
 // devuelve el nombre de la clase (ultima fila)
-export const nombreClase = (datos) => {
+export const posicionClase = (datos) => {
   const columnas = listadoTituloColumnas(datos)
-  return columnas[columnas.length - 1]
+  return {nombre: columnas[columnas.length - 1], index: (columnas.length - 1)}
 };
 
 // devuelve un listado con todos los campos de la fila dada
