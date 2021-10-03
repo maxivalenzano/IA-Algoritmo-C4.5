@@ -63,4 +63,51 @@ export const listadoDeAtributosSeparadosPorClase = (nombreColumna, listaAtributo
     })
     return { atributo: atributo, filtradoSegunClase }
   })
+};
+
+export const sumaEntropia = (calculosPorClase) => {
+  let entropiasTotales = {};
+  calculosPorClase.forEach(item => {
+    item.entropias.forEach(campo => {
+      entropiasTotales[campo.campoAtributo] = (entropiasTotales[campo.campoAtributo] || 0) + campo.entropiaParcial
+    })
+  })
+  const entropyToObject = Object.entries(entropiasTotales).map(item => {
+    return { campo: item[0], entropia: item[1] }
+  })
+  return entropyToObject
+};
+
+export const calculoEntropiaIndividual = (atributo, cantValorPorAtributo) => {
+  return atributo.filtradoSegunClase.map(clase => {
+    const atributoTotal = cantValorPorAtributo.find(item => item.atributo === atributo.atributo)
+    const result = clase.atributos.map(key => {
+      const cantValorAtributo = atributoTotal.cant.find(value => value.campo === key.campo)
+      const campoAtributo = key.campo;
+      const entropiaParcial = -1 * (key.cant / cantValorAtributo.cant * log2(key.cant / cantValorAtributo.cant));
+      return { entropiaParcial: entropiaParcial, campoAtributo: campoAtributo }
+    })
+    return { campoClase: clase.campoClase, entropias: result, atributoTotal: atributoTotal.cant }
+  })
 }
+
+export const cantValorPorAtributo = (listaAtributos, conjuntoDeDatos) => {
+  return listaAtributos.map(atributo => {
+    const result = cantidadApariciones(listadoAtributos(conjuntoDeDatos, atributo));
+    return { cant: result, atributo: atributo }
+  })
+};
+
+export const maximoGanancia = (conjunto) => {
+  const onlyGanancia = conjunto.map(item => item.ganancia);
+  const max = Math.max(...onlyGanancia);
+  const busqueda = conjunto.find(item => item.ganancia === max)
+  return busqueda
+};
+
+export const calculoGananciaInformacion = (entropiaTotalAtributos, entropiaConjunto) => {
+  return entropiaTotalAtributos.map(item => {
+    const ganancia = entropiaConjunto - item.entropia;
+    return { atributo: item.atributo, ganancia: ganancia, entropiasIndividuales: item.entropiasIndividuales }
+  })
+};
