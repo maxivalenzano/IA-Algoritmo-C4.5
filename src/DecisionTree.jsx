@@ -5,8 +5,8 @@ import { cantidadApariciones, calculoEntropiaConjunto, listadoAtributos, posicio
 const DecisionTree = () => {
   const [umbral, setUmbral] = React.useState(0)
   const columnas = listadoTituloColumnas(conjuntoEntrenamiento);
-  const columnasSlide = columnas.slice(1, -1);
-  console.log('🚀 ~ file: DecisionTree.jsx ~ line 10 ~ DecisionTree ~ columnasSlide', columnasSlide);
+  const listaAtributos = columnas.slice(1, -1);
+  console.log('🚀 ~ file: DecisionTree.jsx ~ line 10 ~ DecisionTree ~ listaAtributos', listaAtributos);
   // obtenemos el nombre de la clase
   const nombreDeClase = posicionClase(conjuntoEntrenamiento);
   // obtenemos un listado de todos los componentes
@@ -21,23 +21,23 @@ const DecisionTree = () => {
     const result = conjuntoEntrenamiento.filter(item => item[nombreDeClase.nombre] === clase.campo);
     return{campo: clase.campo , cant: result}
   })
-  console.log('filtradoSegunClase:', filtradoSegunClase);
-  const result = filtradoSegunClase.map(item => 
-    (columnasSlide.map(nombre => 
+  const atributoPorClase = filtradoSegunClase.map(item => 
+    listaAtributos.map(nombre => 
       {
-        const cantidad = cantidadApariciones(listadoAtributos(item.cant, nombre));
+        const listadoValorClase = listadoAtributos(item.cant, nombre);
+        const tipoValorAtributo = cantidadApariciones(listadoValorClase);
         return(
           {
             clase: item.campo,
             atributo: nombre,
-            cant: cantidad
+            cant: tipoValorAtributo,
+            cantValorClase: listadoValorClase.length
           }
       )
     }
-    ))
+    )
   );
-  
-  console.log('🚀 ~ file: DecisionTree.jsx ~ line 26 ~ DecisionTree ~ result', result);
+  console.log('🚀 atributoPorClase', atributoPorClase);
   
 
   return (
