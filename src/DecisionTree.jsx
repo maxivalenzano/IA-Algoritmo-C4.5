@@ -1,25 +1,29 @@
 import React from 'react'
 import conjuntoEntrenamiento from './conjuntoEntrenamiento2'
-import { cantidadApariciones, calculoEntropiaConjunto, listadoAtributos, posicionClase } from './funciones'
+import { cantidadApariciones, calculoEntropiaConjunto, listadoAtributos, posicionClase, listadoTituloColumnas } from './funciones'
 
 const DecisionTree = () => {
   const [umbral, setUmbral] = React.useState(0)
-
+  const columnas = listadoTituloColumnas(conjuntoEntrenamiento);
+  const columnasSlide = columnas.slice(1, -1);
+  console.log('🚀 ~ file: DecisionTree.jsx ~ line 10 ~ DecisionTree ~ columnasSlide', columnasSlide);
   // obtenemos el nombre de la clase
   const nombreDeClase = posicionClase(conjuntoEntrenamiento);
-  console.log('🚀 ~ file: DecisionTree.jsx ~ line 10 ~ DecisionTree ~ nombreDeClase', nombreDeClase);
   // obtenemos un listado de todos los componentes
   const listadoAtributoClases = listadoAtributos(conjuntoEntrenamiento, nombreDeClase.nombre);
-  console.log('🚀 ~ file: DecisionTree.jsx ~ line 13 ~ DecisionTree ~ listadoAtributoClases', listadoAtributoClases);
+  // console.log('🚀 ~ file: DecisionTree.jsx ~ line 12 ~ DecisionTree ~ listadoAtributoClases', listadoAtributoClases);
   // clasificamos en nombre y cantidad
   const cantidadAtributoClases = cantidadApariciones(listadoAtributoClases);
-  console.log('🚀 ~ file: App.js ~ line 15 ~ App ~ cantidadAtributoClases', cantidadAtributoClases);
-
   //se calcula la entropia del conjunto para los valores de la clase
   const entropiaConjunto = calculoEntropiaConjunto(listadoAtributoClases);
   // console.log('entropia del Conjunto: ', entropiaConjunto);
-  const filtradoSegunClase = cantidadAtributoClases.map(clase => conjuntoEntrenamiento.filter(item => item[nombreDeClase.nombre] === clase.campo))
+  const filtradoSegunClase = cantidadAtributoClases.map(clase => {
+    const result = conjuntoEntrenamiento.filter(item => item[nombreDeClase.nombre] === clase.campo);
+    return{campo: clase.campo , cant: result}
+  })
   console.log('filtradoSegunClase:', filtradoSegunClase);
+  filtradoSegunClase.map(item => (columnasSlide.forEach(nombre => console.log({result: item.campo, campo: nombre, cant: cantidadApariciones(listadoAtributos(item.cant, nombre))}))))
+  
 
   return (
     <React.Fragment>
