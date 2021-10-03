@@ -48,7 +48,7 @@ const DecisionTree = () => {
     return { cant: result, atributo: atributo }
   })
 
-  const calculo = listadoAtributosSeparadosPorClase.map(atributo => {
+  const calculoEntropiaIndividual = listadoAtributosSeparadosPorClase.map(atributo => {
     const calculosPorClase = atributo.filtradoSegunClase.map(clase => {
       const atributoTotal = cantValorPorAtributo.find(item => item.atributo === atributo.atributo)
       const result = clase.atributos.map(key => {
@@ -65,14 +65,16 @@ const DecisionTree = () => {
         entropiasTotales[campo.campoAtributo] = (entropiasTotales[campo.campoAtributo] || 0) + campo.entropiaParcial
       })
     })
-    // console.log('🚀 ~ file: DecisionTree.jsx ~ line 67 ~ DecisionTree ~ entropiasTotales', entropiasTotales);
+    const entropyToObject = Object.entries(entropiasTotales).map(item => {
+      return { campo: item[0], entropia: item[1] }
+    })
     return {
       atributo: atributo.atributo,
       // calculosPorClase: calculosPorClase,
-      entropiasTotales: entropiasTotales
+      entropiasTotales: entropyToObject
     }
   })
-  console.log('🚀 ~ file: DecisionTree.jsx ~ line 69 ~ DecisionTree ~ calculo', calculo);
+  console.log('🚀 ~ file: DecisionTree.jsx ~ line 69 ~ DecisionTree ~ calculoEntropiaIndividual', calculoEntropiaIndividual);
 
 
 
