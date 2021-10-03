@@ -52,8 +52,7 @@ const DecisionTree = () => {
       const nombreAtributo = atributo.atributo;
       const atributoTotal = cantValorPorAtributo.find(item => item.atributo === nombreAtributo)
       console.log('🚀 ~ file: DecisionTree.jsx ~ line 54 ~ DecisionTree ~ atributoTotal', atributoTotal);
-      let entropiaAtributos = 0;
-      const entropiaParcialInvidial = atributo.cant.map(item => {
+      const entropiaParciales = atributo.cant.map(item => {
         const cantValorAtributo = atributoTotal.cant.find(value => value.campo === item.campo)
         console.log(`---------${item.campo}---Clase:${atributo.clase}----------`)
         console.log('item buscado:', cantValorAtributo);
@@ -63,7 +62,7 @@ const DecisionTree = () => {
         const entropia = -1 * (item.cant / cantValorAtributo.cant * log2(item.cant / cantValorAtributo.cant));
         return {campo: item.campo, entropiaParcial: entropia}
       });
-      return { nombreAtributo, entropiaParcialInvidial, valorClase: atributo.clase }
+      return { nombreAtributo, entropiaParciales, valorClase: atributo.clase }
     })
   )
   console.log('🚀 ~ file: DecisionTree.jsx ~ line 55 ~ DecisionTree ~ primerosValores', primerosValores);
