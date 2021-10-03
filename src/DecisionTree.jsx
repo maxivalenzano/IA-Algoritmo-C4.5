@@ -19,38 +19,56 @@ const DecisionTree = () => {
   // console.log('entropia del Conjunto: ', entropiaConjunto);
   const filtradoSegunClase = cantidadAtributoClases.map(clase => {
     const result = conjuntoEntrenamiento.filter(item => item[nombreDeClase.nombre] === clase.campo);
-    return{campo: clase.campo , cant: result}
+    return { campo: clase.campo, cant: result }
   })
-  const atributoPorClase = filtradoSegunClase.map(item => 
-    listaAtributos.map(nombre => 
-      {
-        const listadoValorClase = listadoAtributos(item.cant, nombre);
-        const tipoValorAtributo = cantidadApariciones(listadoValorClase);
-        return(
-          {
-            clase: item.campo,
-            atributo: nombre,
-            cant: tipoValorAtributo,
-            cantValorClase: listadoValorClase.length
-          }
+
+  const cantValorPorAtributo = listaAtributos.map(attributo => {
+    const result = cantidadApariciones(listadoAtributos(conjuntoEntrenamiento, attributo));
+    return { cant: result, atributo: attributo }
+  })
+  console.log('🚀 ~ file: DecisionTree.jsx ~ line 28 ~ DecisionTree ~ cantValorPorAtributo', cantValorPorAtributo);
+
+
+  const atributoPorClase = filtradoSegunClase.map(item => {
+    const result = listaAtributos.map(nombre => {
+      const listadoValorClase = listadoAtributos(item.cant, nombre);
+      const tipoValorAtributo = cantidadApariciones(listadoValorClase);
+      return (
+        {
+          clase: item.campo,
+          atributo: nombre,
+          cant: tipoValorAtributo,
+          cantValorClase: listadoValorClase.length
+        }
       )
-    }
-    )
+    })
+    return result;
+  }
   );
   console.log('🚀 atributoPorClase', atributoPorClase);
-  
+
   const primerosValores = atributoPorClase.map(atributoClase =>
-      atributoClase.map(atributo => {
-        const nombreAtributo = atributo.atributo;
-        let entropiaAtributos = 0;
-        atributo.cant.forEach(item =>
-          {
-            entropiaAtributos = entropiaAtributos + -1*(item.cant/atributo.cantValorClase*log2(item.cant/atributo.cantValorClase))
-          });
-        return {nombreAtributo, entropiaAtributos, valorClase: atributo.clase}
-      })
-    )
-  console.log('🚀 ~ file: DecisionTree.jsx ~ line 55 ~ DecisionTree ~ iteracion', primerosValores);
+    atributoClase.map(atributo => {
+      const nombreAtributo = atributo.atributo;
+      const atributoTotal = cantValorPorAtributo.find(item => item.atributo === nombreAtributo)
+      console.log('🚀 ~ file: DecisionTree.jsx ~ line 54 ~ DecisionTree ~ atributoTotal', atributoTotal);
+      let entropiaAtributos = 0;
+      const entropiaParcialInvidial = atributo.cant.map(item => {
+        const cantValorAtributo = atributoTotal.cant.find(value => value.campo === item.campo)
+        console.log(`---------${item.campo}---Clase:${atributo.clase}----------`)
+        console.log('item buscado:', cantValorAtributo);
+        console.log('entropia', -1 * (item.cant / cantValorAtributo.cant * log2(item.cant / cantValorAtributo.cant)));
+        console.log('item.cant', item.cant);
+        console.log('cantValorAtributo.cant', cantValorAtributo.cant);
+        const entropia = -1 * (item.cant / cantValorAtributo.cant * log2(item.cant / cantValorAtributo.cant));
+        return {campo: item.campo, entropiaParcial: entropia}
+      });
+      return { nombreAtributo, entropiaParcialInvidial, valorClase: atributo.clase }
+    })
+  )
+  console.log('🚀 ~ file: DecisionTree.jsx ~ line 55 ~ DecisionTree ~ primerosValores', primerosValores);
+
+
 
 
   return (

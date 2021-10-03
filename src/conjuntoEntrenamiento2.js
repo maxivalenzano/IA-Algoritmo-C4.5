@@ -58,7 +58,7 @@ const conjuntoEntrenamiento2 = [
     "hipertenso": "si",
     "colesterol": "alto",
     "trigliceridos": "normal",
-    "edad": "entre40-61",
+    "edad": "entre40-60",
     "diabetico": "si",
     "p_cardiaco": "si"
 },
@@ -67,13 +67,13 @@ const conjuntoEntrenamiento2 = [
     "hipertenso": "si",
     "colesterol": "alto",
     "trigliceridos": "normal",
-    "edad": "entre40-62",
+    "edad": "entre40-60",
     "diabetico": "si",
     "p_cardiaco": "si"
 },
 {
     "id": 9,
-    "hipertenso": "no",
+    "hipertenso": "si",
     "colesterol": "alto",
     "trigliceridos": "elevado",
     "edad": "mayor60",
