@@ -22,7 +22,22 @@ const DecisionTree = () => {
     return{campo: clase.campo , cant: result}
   })
   console.log('filtradoSegunClase:', filtradoSegunClase);
-  filtradoSegunClase.map(item => (columnasSlide.forEach(nombre => console.log({result: item.campo, campo: nombre, cant: cantidadApariciones(listadoAtributos(item.cant, nombre))}))))
+  const result = filtradoSegunClase.map(item => 
+    (columnasSlide.map(nombre => 
+      {
+        const cantidad = cantidadApariciones(listadoAtributos(item.cant, nombre));
+        return(
+          {
+            clase: item.campo,
+            atributo: nombre,
+            cant: cantidad
+          }
+      )
+    }
+    ))
+  );
+  
+  console.log('🚀 ~ file: DecisionTree.jsx ~ line 26 ~ DecisionTree ~ result', result);
   
 
   return (
