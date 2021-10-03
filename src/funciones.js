@@ -7,7 +7,7 @@ export const listadoTituloColumnas = (datos) => {
 // devuelve el nombre de la clase (ultima fila)
 export const posicionClase = (datos) => {
   const columnas = listadoTituloColumnas(datos)
-  return {nombre: columnas[columnas.length - 1], index: (columnas.length - 1)}
+  return { nombre: columnas[columnas.length - 1], index: (columnas.length - 1) }
 };
 
 // devuelve un listado con todos los campos de la fila dada
@@ -42,3 +42,25 @@ export const calculoEntropiaConjunto = (columna) => {
   })
   return entropia;
 };
+
+export const listadoDeAtributosSeparadosPorClase = (nombreColumna, listaAtributos, conjuntoDeDatos) => {
+  const cantidadAtributoClases = cantidadApariciones(listadoAtributos(conjuntoDeDatos, nombreColumna.nombre));
+  return listaAtributos.map(atributo => {
+    const filtradoSegunClase = cantidadAtributoClases.map(clase => {
+      const listadoCamposClase = conjuntoDeDatos.filter(item =>
+        (item[nombreColumna.nombre] === clase.campo)
+      );
+      const listadoAtributosSeparadoPorClase = listadoCamposClase.map(item => {
+        return item[atributo]
+      })
+      const aparicionesAtributo = cantidadApariciones(listadoAtributosSeparadoPorClase);
+      return {
+        campoClase: clase.campo,
+        cantCampoClase: listadoCamposClase.length,
+        campoAtributo: listadoAtributosSeparadoPorClase,
+        atributos: aparicionesAtributo
+      }
+    })
+    return { atributo: atributo, filtradoSegunClase }
+  })
+}

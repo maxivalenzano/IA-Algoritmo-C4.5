@@ -1,47 +1,24 @@
 import React from 'react'
 import conjuntoEntrenamiento from './conjuntoEntrenamiento2'
-import { log2, cantidadApariciones, calculoEntropiaConjunto, listadoAtributos, posicionClase, listadoTituloColumnas } from './funciones'
+import { log2, cantidadApariciones, calculoEntropiaConjunto, listadoAtributos, posicionClase, listadoTituloColumnas, listadoDeAtributosSeparadosPorClase } from './funciones'
 
 const DecisionTree = () => {
   const [umbral, setUmbral] = React.useState(0)
   const columnas = listadoTituloColumnas(conjuntoEntrenamiento);
   const listaAtributos = columnas.slice(1, -1);
-  // console.log('🚀 ~ file: DecisionTree.jsx ~ line 10 ~ DecisionTree ~ listaAtributos', listaAtributos);
   // obtenemos el nombre de la clase
   const nombreDeClase = posicionClase(conjuntoEntrenamiento);
   // obtenemos un listado de todos los componentes
   const listadoAtributoClases = listadoAtributos(conjuntoEntrenamiento, nombreDeClase.nombre);
-  // console.log('🚀 ~ file: DecisionTree.jsx ~ line 12 ~ DecisionTree ~ listadoAtributoClases', listadoAtributoClases);
   // clasificamos en nombre y cantidad
-  const cantidadAtributoClases = cantidadApariciones(listadoAtributoClases);
+  // const cantidadAtributoClases = cantidadApariciones(listadoAtributoClases);
   //se calcula la entropia del conjunto para los valores de la clase
   const entropiaConjunto = calculoEntropiaConjunto(listadoAtributoClases);
-  // console.log('entropia del Conjunto: ', entropiaConjunto);
-  // const filtradoSegunClase = cantidadAtributoClases.map(clase => {
-  //   const result = conjuntoEntrenamiento.filter(item => item[nombreDeClase.nombre] === clase.campo);
-  //   return { campo: clase.campo, cant: result }
-  // })
-  // console.log('🚀 ~ file: DecisionTree.jsx ~ line 24 ~ DecisionTree ~ filtradoSegunClase', filtradoSegunClase);
 
-  const listadoAtributosSeparadosPorClase = listaAtributos.map(atributo => {
-    const filtradoSegunClase = cantidadAtributoClases.map(clase => {
-      const listadoCamposClase = conjuntoEntrenamiento.filter(item =>
-        (item[nombreDeClase.nombre] === clase.campo)
-      );
-      const listadoAtributosSeparadoPorClase = listadoCamposClase.map(item => {
-        return item[atributo]
-      })
-      const aparicionesAtributo = cantidadApariciones(listadoAtributosSeparadoPorClase);
-      return {
-        campoClase: clase.campo,
-        cantCampoClase: listadoCamposClase.length,
-        campoAtributo: listadoAtributosSeparadoPorClase,
-        atributos: aparicionesAtributo
-      }
-    })
-    return { atributo: atributo, filtradoSegunClase }
-  })
-  // console.log('listadoAtributosSeparadosPorClase', listadoAtributosSeparadosPorClase);
+  
+
+  const listadoAtributosSeparadosPorClase = listadoDeAtributosSeparadosPorClase(nombreDeClase, listaAtributos, conjuntoEntrenamiento);
+  console.log('listadoAtributosSeparadosPorClase', listadoAtributosSeparadosPorClase);
 
   const cantValorPorAtributo = listaAtributos.map(atributo => {
     const result = cantidadApariciones(listadoAtributos(conjuntoEntrenamiento, atributo));
