@@ -1,6 +1,6 @@
 import React from 'react'
 import conjuntoEntrenamiento from './conjuntoEntrenamiento2'
-import { cantidadApariciones, calculoEntropiaConjunto, listadoAtributos, posicionClase, listadoTituloColumnas } from './funciones'
+import { log2, cantidadApariciones, calculoEntropiaConjunto, listadoAtributos, posicionClase, listadoTituloColumnas } from './funciones'
 
 const DecisionTree = () => {
   const [umbral, setUmbral] = React.useState(0)
@@ -39,6 +39,19 @@ const DecisionTree = () => {
   );
   console.log('🚀 atributoPorClase', atributoPorClase);
   
+  const primerosValores = atributoPorClase.map(atributoClase =>
+      atributoClase.map(atributo => {
+        const nombreAtributo = atributo.atributo;
+        let entropiaAtributos = 0;
+        atributo.cant.forEach(item =>
+          {
+            entropiaAtributos = entropiaAtributos + -1*(item.cant/atributo.cantValorClase*log2(item.cant/atributo.cantValorClase))
+          });
+        return {nombreAtributo, entropiaAtributos, valorClase: atributo.clase}
+      })
+    )
+  console.log('🚀 ~ file: DecisionTree.jsx ~ line 55 ~ DecisionTree ~ iteracion', primerosValores);
+
 
   return (
     <React.Fragment>
