@@ -1,7 +1,7 @@
 import React from 'react';
-import CSVReader from "react-csv-reader";
+import CSVReader from 'react-csv-reader';
 import DecisionTree from './DecisionTree';
-import "./styles.css";
+import './styles.css';
 
 const App = () => {
   const handleForce = (data, fileInfo) => console.log(data, fileInfo);
@@ -9,7 +9,7 @@ const App = () => {
     header: true,
     dynamicTyping: true,
     skipEmptyLines: true,
-    transformHeader: header => header.toLowerCase().replace(/\W/g, "_")
+    transformHeader: (header) => header.toLowerCase().replace(/\W/g, '_'),
   };
   return (
     <div className="container">
@@ -22,6 +22,6 @@ const App = () => {
       <DecisionTree />
     </div>
   );
-}
+};
 
 export default App;
