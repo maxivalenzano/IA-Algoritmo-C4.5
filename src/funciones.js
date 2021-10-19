@@ -1,3 +1,4 @@
+import { omit } from 'lodash-es';
 // devuelve los titulos de la primer fila
 export const listadoTituloColumnas = (datos) => {
   return Object.keys(datos[0]);
@@ -10,6 +11,11 @@ export const posicionClase = (datos) => {
     nombre: columnas[columnas.length - 1],
     index: columnas.length - 1,
   };
+};
+// devuelve el nombre del ID (primera columna)
+export const nombreID = (datos) => {
+  const columnas = listadoTituloColumnas(datos);
+  return columnas[0];
 };
 
 // devuelve un listado con todos los campos de la fila dada
@@ -37,16 +43,16 @@ export const cantidadApariciones = (arr) => {
   return object;
 };
 
-// devuelve la entropia del conjunto
-export const calculoEntropiaConjunto = (columna) => {
+// devuelve la entropía del conjunto
+export const calculoEntropíaConjunto = (columna) => {
   const columnaClase = cantidadApariciones(columna);
   const cantAtrib = columna.length;
-  let entropia = 0;
+  let entropía = 0;
   columnaClase.forEach((item) => {
-    entropia =
-      entropia + -1 * (item.cant / cantAtrib) * log2(item.cant / cantAtrib);
+    entropía =
+      entropía + -1 * (item.cant / cantAtrib) * log2(item.cant / cantAtrib);
   });
-  return entropia;
+  return entropía;
 };
 
 export const listadoDeAtributosSeparadosPorClase = (
@@ -84,24 +90,24 @@ export const listadoDeAtributosSeparadosPorClase = (
   });
 };
 
-export const sumaEntropia = (calculosPorClase) => {
-  let entropiasTotales = {};
+export const sumaEntropía = (calculosPorClase) => {
+  let entropíasTotales = {};
   calculosPorClase.forEach((item) => {
-    item.entropias.forEach((campo) => {
-      entropiasTotales[campo.campoAtributo] =
-        (entropiasTotales[campo.campoAtributo] || 0) + campo.entropiaParcial;
+    item.entropías.forEach((campo) => {
+      entropíasTotales[campo.campoAtributo] =
+        (entropíasTotales[campo.campoAtributo] || 0) + campo.entropíaParcial;
     });
   });
-  const entropyToObject = Object.entries(entropiasTotales).map((item) => {
+  const entropyToObject = Object.entries(entropíasTotales).map((item) => {
     return {
       campo: item[0],
-      entropia: item[1],
+      entropía: item[1],
     };
   });
   return entropyToObject;
 };
 
-export const calculoEntropiaIndividual = (atributo, cantValorPorAtributo) => {
+export const calculoEntropíaIndividual = (atributo, cantValorPorAtributo) => {
   return atributo.filtradoSegunClase.map((clase) => {
     const atributoTotal = cantValorPorAtributo.find(
       (item) => item.atributo === atributo.atributo
@@ -111,18 +117,18 @@ export const calculoEntropiaIndividual = (atributo, cantValorPorAtributo) => {
         (value) => value.campo === key.campo
       );
       const campoAtributo = key.campo;
-      const entropiaParcial =
+      const entropíaParcial =
         -1 *
         ((key.cant / cantValorAtributo.cant) *
           log2(key.cant / cantValorAtributo.cant));
       return {
-        entropiaParcial: entropiaParcial,
+        entropíaParcial: entropíaParcial,
         campoAtributo: campoAtributo,
       };
     });
     return {
       campoClase: clase.campoClase,
-      entropias: result,
+      entropías: result,
       atributoTotal: atributoTotal.cant,
     };
   });
@@ -148,15 +154,44 @@ export const maximoGanancia = (conjunto) => {
 };
 
 export const calculoGananciaInformacion = (
-  entropiaTotalAtributos,
-  entropiaConjunto
+  entropíaTotalAtributos,
+  entropíaConjunto
 ) => {
-  return entropiaTotalAtributos.map((item) => {
-    const ganancia = entropiaConjunto - item.entropia;
+  return entropíaTotalAtributos.map((item) => {
+    const ganancia = entropíaConjunto - item.entropía;
     return {
       atributo: item.atributo,
       ganancia: ganancia,
-      entropiasIndividuales: item.entropiasIndividuales,
+      entropíasIndividuales: item.entropíasIndividuales,
     };
   });
+};
+
+export const reducirTabla = (gananciaMax, atributos) => {
+  const camposPuros = gananciaMax.entropíasIndividuales
+    .filter((item) => item.entropía === 0)
+    .map((item) => item.campo);
+  let tablaSinCamposPuros = atributos;
+  if (camposPuros.length) {
+    tablaSinCamposPuros = atributos.filter(
+      (item) => !camposPuros.includes(item[gananciaMax.atributo])
+    );
+  }
+  return tablaSinCamposPuros;
+};
+
+export const filterConjunto = (
+  conjunto,
+  clase,
+  id = '',
+  firstIteracion = false
+) => {
+  const filtered = firstIteracion
+    ? conjunto.map((item) => {
+        return omit(item, [id, clase]);
+      })
+    : conjunto.map((item) => {
+        return omit(item, clase);
+      });
+  return filtered;
 };

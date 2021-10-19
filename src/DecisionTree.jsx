@@ -1,24 +1,38 @@
-import React from 'react';
+import React, { useState } from 'react';
 import conjuntoEntrenamiento from './conjuntoEntrenamiento2';
 import {
   maximoGanancia,
-  calculoEntropiaConjunto,
+  calculoEntropíaConjunto,
   listadoAtributos,
   posicionClase,
+  nombreID,
   listadoTituloColumnas,
   listadoDeAtributosSeparadosPorClase,
-  sumaEntropia,
-  calculoEntropiaIndividual,
+  sumaEntropía,
+  calculoEntropíaIndividual,
   cantValorPorAtributo,
   calculoGananciaInformacion,
+  reducirTabla,
+  filterConjunto,
 } from './funciones';
 
 const DecisionTree = () => {
   const [umbral, setUmbral] = React.useState(0);
-  const columnas = listadoTituloColumnas(conjuntoEntrenamiento);
-  const listaAtributos = columnas.slice(1, -1);
+  const [primeraIteracion, setPrimeraIteracion] = useState(true);
   // obtenemos el nombre de la clase
   const nombreDeClase = posicionClase(conjuntoEntrenamiento);
+  const nombreDeID = nombreID(conjuntoEntrenamiento);
+  const columnas = listadoTituloColumnas(conjuntoEntrenamiento);
+  const listaAtributos = columnas.filter(
+    (item) => item !== nombreDeID && item !== nombreDeClase.nombre
+  );
+  const onlyAtributos = filterConjunto(
+    conjuntoEntrenamiento,
+    nombreDeClase.nombre,
+    nombreDeID,
+    primeraIteracion
+  );
+  // console.log('🚀 ~ file: DecisionTree.jsx ~ line 21 ~ DecisionTree ~ onlyAtributos', onlyAtributos);
   // obtenemos un listado de todos los componentes
   const listadoAtributoClases = listadoAtributos(
     conjuntoEntrenamiento,
@@ -26,80 +40,83 @@ const DecisionTree = () => {
   );
   // clasificamos en nombre y cantidad
   // const cantidadAtributoClases = cantidadApariciones(listadoAtributoClases);
-  //se calcula la entropia del conjunto para los valores de la clase
-  const entropiaConjunto = calculoEntropiaConjunto(listadoAtributoClases);
+  //se calcula la entropía del conjunto para los valores de la clase
+  const entropíaConjunto = calculoEntropíaConjunto(listadoAtributoClases);
 
   const listadoAtributosSeparadosPorClase = listadoDeAtributosSeparadosPorClase(
     nombreDeClase,
     listaAtributos,
     conjuntoEntrenamiento
   );
-  // console.log('listadoAtributosSeparadosPorClase', listadoAtributosSeparadosPorClase);
+  // console.log('🚀 ~ file: DecisionTree.jsx ~ line 37 ~ DecisionTree ~ listadoAtributosSeparadosPorClase', listadoAtributosSeparadosPorClase);
 
   const cantValorPorAtributoConst = cantValorPorAtributo(
     listaAtributos,
     conjuntoEntrenamiento
   );
 
-  const calculosEntropiaIndividual = listadoAtributosSeparadosPorClase.map(
+  const calculosEntropíaIndividual = listadoAtributosSeparadosPorClase.map(
     (atributo) => {
-      const calculosPorClase = calculoEntropiaIndividual(
+      const calculosPorClase = calculoEntropíaIndividual(
         atributo,
         cantValorPorAtributoConst
       );
-      const entropiaTotal = sumaEntropia(calculosPorClase);
+      const entropíaTotal = sumaEntropía(calculosPorClase);
       return {
         atributo: atributo.atributo,
-        cantAtrinutos: calculosPorClase[0].atributoTotal,
+        cantAtributos: calculosPorClase[0].atributoTotal,
         // calculosPorClase: calculosPorClase,
-        entropiasTotales: entropiaTotal,
+        entropíasTotales: entropíaTotal,
       };
     }
   );
-  // console.log('🚀 ~ file: DecisionTree.jsx ~ line 37 ~ DecisionTree ~ calculosEntropiaIndividual', calculosEntropiaIndividual);
+  // console.log('🚀 ~ file: DecisionTree.jsx ~ line 37 ~ DecisionTree ~ calculosEntropíaIndividual', calculosEntropíaIndividual);
 
-  const entropiaTotalAtributos = calculosEntropiaIndividual.map((item) => {
-    const result = item.entropiasTotales.map((value) => {
-      const cantValorAtributo = item.cantAtrinutos.find(
+  const entropíaTotalAtributos = calculosEntropíaIndividual.map((item) => {
+    const result = item.entropíasTotales.map((value) => {
+      const cantValorAtributo = item.cantAtributos.find(
         (key) => key.campo === value.campo
       );
       const entropy =
         (cantValorAtributo.cant / listadoAtributoClases.length) *
-        value.entropia;
+        value.entropía;
       return {
         campo: value.campo,
         entropy: entropy,
       };
     });
-    const entropia = result
+    const entropía = result
       .map((item) => item.entropy)
       .reduce((acc, curr) => {
         return acc + curr;
       }, 0);
     return {
       atributo: item.atributo,
-      entropia,
-      entropiasIndividuales: item.entropiasTotales,
+      entropía,
+      entropíasIndividuales: item.entropíasTotales,
     };
   });
-  console.log(
-    '🚀 ~ file: DecisionTree.jsx ~ line 83 ~ DecisionTree ~ entropiaTotalAtributos',
-    entropiaTotalAtributos
-  );
 
   const calculoGananciaInform = calculoGananciaInformacion(
-    entropiaTotalAtributos,
-    entropiaConjunto
-  );
-  console.log(
-    '🚀 ~ file: DecisionTree.jsx ~ line 96 ~ DecisionTree ~ calculoGananciaInform',
-    calculoGananciaInform
+    entropíaTotalAtributos,
+    entropíaConjunto
   );
 
   const gananciaMaxima = maximoGanancia(calculoGananciaInform);
   console.log(
     '🚀 ~ file: DecisionTree.jsx ~ line 59 ~ DecisionTree ~ gananciaMaxima',
     gananciaMaxima
+  );
+
+  const nuevaTabla = reducirTabla(gananciaMaxima, onlyAtributos);
+  console.log(
+    '🚀 ~ file: DecisionTree.jsx ~ line 130 ~ DecisionTree ~ nuevaTabla',
+    nuevaTabla
+  );
+  const nuevito = filterConjunto(nuevaTabla, gananciaMaxima.atributo);
+  console.log(
+    '🚀 ~ file: DecisionTree.jsx ~ line 121 ~ DecisionTree ~ nuevito',
+    nuevito
   );
 
   return (
@@ -113,7 +130,7 @@ const DecisionTree = () => {
         max={100}
       />
       <p>Nombre de la clase: {nombreDeClase.nombre}</p>
-      <p>Entropia del conjunto: {entropiaConjunto}</p>
+      <p>Entropía del conjunto: {entropíaConjunto}</p>
     </React.Fragment>
   );
 };
