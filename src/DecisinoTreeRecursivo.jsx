@@ -13,12 +13,11 @@ import {
   cantValorPorAtributo,
   calculoGananciaInformacion,
   reducirTabla,
-  filterConjunto,
+  filterConjunto
 } from './funciones';
 
-const DecisionTree = () => {
-  const [umbral, setUmbral] = React.useState(0);
-  const [primeraIteracion] = useState(true);
+const DecisinoTreeRecursivo = ({umbral, primeraIteracion, setPrimeraIteracion}) => {
+
   // obtenemos el nombre de la clase
   const nombreDeClase = posicionClase(conjuntoEntrenamiento);
   const nombreDeID = nombreID(conjuntoEntrenamiento);
@@ -26,13 +25,8 @@ const DecisionTree = () => {
   const listaAtributos = columnas.filter(
     (item) => item !== nombreDeID && item !== nombreDeClase.nombre
   );
-  const onlyAtributos = filterConjunto(
-    conjuntoEntrenamiento,
-    nombreDeClase.nombre,
-    nombreDeID,
-    primeraIteracion
-  );
-  // console.log('🚀 ~ file: DecisionTree.jsx ~ line 21 ~ DecisionTree ~ onlyAtributos', onlyAtributos);
+  const onlyAtributos = filterConjunto(conjuntoEntrenamiento, nombreDeClase.nombre, nombreDeID, primeraIteracion);
+  // console.log('🚀 ~ file: DecisinoTreeRecursivo.jsx ~ line 21 ~ DecisinoTreeRecursivo ~ onlyAtributos', onlyAtributos);
   // obtenemos un listado de todos los componentes
   const listadoAtributoClases = listadoAtributos(
     conjuntoEntrenamiento,
@@ -48,7 +42,7 @@ const DecisionTree = () => {
     listaAtributos,
     conjuntoEntrenamiento
   );
-  console.log('🚀 ~ file: DecisionTree.jsx ~ line 51 ~ DecisionTree ~ listadoAtributosSeparadosPorClase', listadoAtributosSeparadosPorClase);
+  // console.log('🚀 ~ file: DecisinoTreeRecursivo.jsx ~ line 37 ~ DecisinoTreeRecursivo ~ listadoAtributosSeparadosPorClase', listadoAtributosSeparadosPorClase);
 
   const cantValorPorAtributoConst = cantValorPorAtributo(
     listaAtributos,
@@ -70,7 +64,7 @@ const DecisionTree = () => {
       };
     }
   );
-  // console.log('🚀 ~ file: DecisionTree.jsx ~ line 37 ~ DecisionTree ~ calculosEntropíaIndividual', calculosEntropíaIndividual);
+  // console.log('🚀 ~ file: DecisinoTreeRecursivo.jsx ~ line 37 ~ DecisinoTreeRecursivo ~ calculosEntropíaIndividual', calculosEntropíaIndividual);
 
   const entropíaTotalAtributos = calculosEntropíaIndividual.map((item) => {
     const result = item.entropíasTotales.map((value) => {
@@ -101,44 +95,27 @@ const DecisionTree = () => {
     entropíaTotalAtributos,
     entropíaConjunto
   );
-  console.log('🚀 ~ file: DecisionTree.jsx ~ line 104 ~ DecisionTree ~ calculoGananciaInform', calculoGananciaInform);
-  
 
   const gananciaMaxima = maximoGanancia(calculoGananciaInform);
-  console.log('🚀 ~ file: DecisionTree.jsx ~ line 108 ~ DecisionTree ~ gananciaMaxima', gananciaMaxima);
-
-
-  const nuevoDataSet = reducirTabla(gananciaMaxima, onlyAtributos);
-
-  const nuevaTablaSinNodo = filterConjunto(nuevoDataSet, gananciaMaxima.atributo);
-
-  const columnasNuevas = listadoTituloColumnas(nuevoDataSet);
-
-  const listaAtributosNuevos = columnasNuevas.filter(
-    (item) => item !== nombreDeID && item !== gananciaMaxima.atributo
+  console.log(
+    '🚀 ~ file: DecisinoTreeRecursivo.jsx ~ line 59 ~ DecisinoTreeRecursivo ~ gananciaMaxima',
+    gananciaMaxima
   );
 
-  const listadoAtributosSeparadosPorClaseNuevo = listadoDeAtributosSeparadosPorClase(
-    {nombre: gananciaMaxima.atributo},
-    listaAtributosNuevos,
-    nuevoDataSet
+  const nuevaTabla = reducirTabla(gananciaMaxima, onlyAtributos);
+  console.log(
+    '🚀 ~ file: DecisinoTreeRecursivo.jsx ~ line 130 ~ DecisinoTreeRecursivo ~ nuevaTabla',
+    nuevaTabla
   );
-  console.log('🚀 ~ file: DecisionTree.jsx ~ line 126 ~ DecisionTree ~ listadoAtributosSeparadosPorClaseNuevo', listadoAtributosSeparadosPorClaseNuevo);
+  const nuevito = filterConjunto(nuevaTabla, gananciaMaxima.atributo);
+  console.log('🚀 ~ file: DecisinoTreeRecursivo.jsx ~ line 121 ~ DecisinoTreeRecursivo ~ nuevito', nuevito);
 
   return (
     <React.Fragment>
-      <p>Ingrese Umbral: </p>
-      <input
-        value={umbral}
-        onChange={(e) => setUmbral(e.target.value)}
-        type="number"
-        min={1}
-        max={100}
-      />
       <p>Nombre de la clase: {nombreDeClase.nombre}</p>
       <p>Entropía del conjunto: {entropíaConjunto}</p>
     </React.Fragment>
   );
 };
 
-export default DecisionTree;
+export default DecisinoTreeRecursivo;
