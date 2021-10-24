@@ -19,7 +19,7 @@ export const nombreID = (datos) => {
 };
 
 // devuelve un listado con todos los campos de la fila dada
-export const listadoAtributos = (datos, nombreColumna) => {
+export const listadoValoresColumna = (datos, nombreColumna) => {
   return datos.map((item) => item[nombreColumna]);
 };
 
@@ -55,18 +55,18 @@ export const calculoEntropíaConjunto = (columna) => {
   return entropía;
 };
 
-export const listadoDeAtributosSeparadosPorClase = (
+export const listadoDeAtributosSeparadosPorColumna = (
   nombreColumna,
   listaAtributos,
-  conjuntoDeDatos
+  dataSet
 ) => {
   const cantidadAtributoClases = cantidadApariciones(
-    listadoAtributos(conjuntoDeDatos, nombreColumna.nombre)
+    listadoValoresColumna(dataSet, nombreColumna)
   );
   return listaAtributos.map((atributo) => {
     const filtradoSegunClase = cantidadAtributoClases.map((clase) => {
-      const listadoCamposClase = conjuntoDeDatos.filter(
-        (item) => item[nombreColumna.nombre] === clase.campo
+      const listadoCamposClase = dataSet.filter(
+        (item) => item[nombreColumna] === clase.campo
       );
       const listadoAtributosSeparadoPorClase = listadoCamposClase.map(
         (item) => {
@@ -137,7 +137,7 @@ export const calculoEntropíaIndividual = (atributo, cantValorPorAtributo) => {
 export const cantValorPorAtributo = (listaAtributos, conjuntoDeDatos) => {
   return listaAtributos.map((atributo) => {
     const result = cantidadApariciones(
-      listadoAtributos(conjuntoDeDatos, atributo)
+      listadoValoresColumna(conjuntoDeDatos, atributo)
     );
     return {
       cant: result,
@@ -168,30 +168,32 @@ export const calculoGananciaInformacion = (
 };
 
 export const reducirTabla = (gananciaMax, atributos) => {
+  let nuevoDataSet = atributos;
   const camposPuros = gananciaMax.entropíasIndividuales
     .filter((item) => item.entropía === 0)
     .map((item) => item.campo);
-  let tablaSinCamposPuros = atributos;
   if (camposPuros.length) {
-    tablaSinCamposPuros = atributos.filter(
+    nuevoDataSet = atributos.filter(
       (item) => !camposPuros.includes(item[gananciaMax.atributo])
     );
   }
-  return tablaSinCamposPuros;
+  return nuevoDataSet;
 };
 
 export const filterConjunto = (
   conjunto,
-  clase,
-  id = '',
-  firstIteracion = false
+  clase
 ) => {
-  const filtered = firstIteracion
-    ? conjunto.map((item) => {
-        return omit(item, [id, clase]);
-      })
-    : conjunto.map((item) => {
-        return omit(item, clase);
-      });
+  const filtered = conjunto.map((item) => {
+    return omit(item, clase);
+  });
   return filtered;
 };
+
+export const filtradoSegunAtributoGananciaMaxima = (gananciaMax, dataSet) => {
+  return gananciaMax.entropíasIndividuales.map(valor => {
+    const result = dataSet.filter(item => item[gananciaMax.atributo] === valor.campo);
+    const filtrados = result.map(fila => omit(fila, gananciaMax.atributo))
+    return { valorAtributo: valor.campo, filas: filtrados }
+  })
+}
