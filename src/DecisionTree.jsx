@@ -5,110 +5,62 @@ import {
   calculoEntropíaConjunto,
   listadoValoresColumna,
   posicionClase,
-  listadoTituloColumnas,
-  listadoDeAtributosSeparadosPorColumna,
-  sumaEntropía,
-  calculoEntropíaIndividual,
-  cantValorPorAtributo,
   calculoGananciaInformacion,
   reducirTabla,
-  filterConjunto,
   filtradoSegunAtributoGananciaMaxima,
+  calcularEntropiaTotalXAtributo
 } from './funciones';
 
 const DecisionTree = () => {
+
   const [umbral, setUmbral] = React.useState(0);
   // obtenemos el nombre de la clase
   const clase = posicionClase(dataSet);
-  const columnas = listadoTituloColumnas(dataSet);
-  const listaAtributos = columnas.filter(
-    (item) => item !== clase.nombre
-  );
-  const onlyAtributos = filterConjunto(
-    dataSet,
-    clase.nombre,
-  );
-  // console.log('🚀 ~ file: DecisionTree.jsx ~ line 21 ~ DecisionTree ~ onlyAtributos', onlyAtributos);
+
   // obtenemos un listado de todos los componentes
   const listadoValoresClases = listadoValoresColumna(
     dataSet,
     clase.nombre
   );
-  // clasificamos en nombre y cantidad
-  // const cantidadAtributoClases = cantidadApariciones(listadoValoresClases);
   //se calcula la entropía del conjunto para los valores de la clase
   const entropíaConjunto = calculoEntropíaConjunto(listadoValoresClases);
 
-  const listadoAtributosSeparadosPorClase = listadoDeAtributosSeparadosPorColumna(
-    clase.nombre,
-    listaAtributos,
-    dataSet
-  );
-  console.log('🚀 ~ file: DecisionTree.jsx ~ line 51 ~ DecisionTree ~ listadoAtributosSeparadosPorClase', listadoAtributosSeparadosPorClase);
-
-  const cantValorPorAtributoConst = cantValorPorAtributo(
-    listaAtributos,
-    dataSet
-  );
-
-  const calculosEntropíaIndividual = listadoAtributosSeparadosPorClase.map(
-    (atributo) => {
-      const calculosPorClase = calculoEntropíaIndividual(
-        atributo,
-        cantValorPorAtributoConst
-      );
-      const entropíaTotal = sumaEntropía(calculosPorClase);
-      return {
-        atributo: atributo.atributo,
-        cantAtributos: calculosPorClase[0].atributoTotal,
-        // calculosPorClase: calculosPorClase,
-        entropíasTotales: entropíaTotal,
-      };
-    }
-  );
-  // console.log('🚀 ~ file: DecisionTree.jsx ~ line 37 ~ DecisionTree ~ calculosEntropíaIndividual', calculosEntropíaIndividual);
-
-  const entropíaTotalAtributos = calculosEntropíaIndividual.map((item) => {
-    const result = item.entropíasTotales.map((value) => {
-      const cantValorAtributo = item.cantAtributos.find(
-        (key) => key.campo === value.campo
-      );
-      const entropy =
-        (cantValorAtributo.cant / listadoValoresClases.length) *
-        value.entropía;
-      return {
-        campo: value.campo,
-        entropy: entropy,
-      };
-    });
-    const entropía = result
-      .map((item) => item.entropy)
-      .reduce((acc, curr) => {
-        return acc + curr;
-      }, 0);
-    return {
-      atributo: item.atributo,
-      entropía,
-      entropíasIndividuales: item.entropíasTotales,
-    };
-  });
+  const entropíaTotalAtributos = calcularEntropiaTotalXAtributo(clase.nombre, dataSet)
 
   const calculoGananciaInform = calculoGananciaInformacion(
     entropíaTotalAtributos,
     entropíaConjunto
   );
-  console.log('🚀 ~ file: DecisionTree.jsx ~ line 104 ~ DecisionTree ~ calculoGananciaInform', calculoGananciaInform);
-
+  // console.log('🚀 ~ file: DecisionTree.jsx ~ line 104 ~ DecisionTree ~ calculoGananciaInform', calculoGananciaInform);
 
   const gananciaMaxima = maximoGanancia(calculoGananciaInform);
-  console.log('🚀 ~ file: DecisionTree.jsx ~ line 108 ~ DecisionTree ~ gananciaMaxima', gananciaMaxima);
-
+  // console.log('🚀 ~ file: DecisionTree.jsx ~ line 108 ~ DecisionTree ~ gananciaMaxima', gananciaMaxima);
 
   const nuevoDataSetSinPuros = reducirTabla(gananciaMaxima, dataSet);
-  console.log("🚀 ~ file: DecisionTree.jsx ~ line 107 ~ DecisionTree ~ nuevoDataSetSinPuros", nuevoDataSetSinPuros)
+  // console.log("🚀 ~ file: DecisionTree.jsx ~ line 107 ~ DecisionTree ~ nuevoDataSetSinPuros", nuevoDataSetSinPuros)
 
   const dataSetForExpansion = filtradoSegunAtributoGananciaMaxima(gananciaMaxima, nuevoDataSetSinPuros)
   console.log("🚀 ~ file: DecisionTree.jsx ~ line 117 ~ dataSetForExpansion", dataSetForExpansion)
+
+  //segunda iteracion
+  const sexo = dataSetForExpansion.map(dataSetXValorAtributo => {
+    //calculamos la entropia de los nuevos conjuntos de expansion
+    const listadoValoresClasesExpansion = listadoValoresColumna(
+      dataSetXValorAtributo.filas,
+      clase.nombre
+    );
+
+    const entropíaConjuntoExpansion = calculoEntropíaConjunto(listadoValoresClasesExpansion);
+    // const entropiaAtributosIndividualesExpansion = (dataSetXValorAtributo.filas.length === 0) ? [] : calculoEntropiaIndividual(clase.nombre, dataSetXValorAtributo.filas);
+    const entropíaTotalAtributosExpansion = (dataSetXValorAtributo.filas.length === 0) ? [] : calcularEntropiaTotalXAtributo(clase.nombre, dataSetXValorAtributo.filas)
+
+    return {
+      valorAtributo: dataSetXValorAtributo.valorAtributo,
+      entropia: entropíaConjuntoExpansion,
+      entropiaAtributos: entropíaTotalAtributosExpansion
+    }
+  });
+  console.log("🚀 ~ file: DecisionTree.jsx ~ line 120 ~ DecisionTree ~ sexo", sexo)
 
   return (
     <React.Fragment>

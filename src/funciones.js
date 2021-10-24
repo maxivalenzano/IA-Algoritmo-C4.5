@@ -57,9 +57,12 @@ export const calculoEntropíaConjunto = (columna) => {
 
 export const listadoDeAtributosSeparadosPorColumna = (
   nombreColumna,
-  listaAtributos,
   dataSet
 ) => {
+  const columnas = listadoTituloColumnas(dataSet);
+  const listaAtributos = columnas.filter(
+    (item) => item !== nombreColumna
+  );
   const cantidadAtributoClases = cantidadApariciones(
     listadoValoresColumna(dataSet, nombreColumna)
   );
@@ -196,4 +199,74 @@ export const filtradoSegunAtributoGananciaMaxima = (gananciaMax, dataSet) => {
     const filtrados = result.map(fila => omit(fila, gananciaMax.atributo))
     return { valorAtributo: valor.campo, filas: filtrados }
   })
-}
+};
+
+export const calculoEntropiaIndividual = (claseNombre, dataSet) => {
+
+  const columnas = listadoTituloColumnas(dataSet);
+  const listaAtributos = columnas.filter(
+    (item) => item !== claseNombre
+  );
+
+  const listadoAtributosSeparadosPorClase = listadoDeAtributosSeparadosPorColumna(
+    claseNombre,
+    dataSet
+  );
+
+  const cantValorPorAtributoConst = cantValorPorAtributo(
+    listaAtributos,
+    dataSet
+  );
+
+  const calculosEntropíaIndividual = listadoAtributosSeparadosPorClase.map(
+    (atributo) => {
+      const calculosPorClase = calculoEntropíaIndividual(
+        atributo,
+        cantValorPorAtributoConst
+      );
+      const entropíaTotal = sumaEntropía(calculosPorClase);
+      return {
+        atributo: atributo.atributo,
+        cantAtributos: calculosPorClase[0].atributoTotal,
+        entropíasTotales: entropíaTotal,
+      };
+    }
+  );
+  return calculosEntropíaIndividual
+};
+
+export const calcularEntropiaTotalXAtributo = (nombreClase, dataSet) => {
+
+  const listadoValoresClases = listadoValoresColumna(
+    dataSet,
+    nombreClase
+  );
+
+  const calculosEntropíaIndividual = calculoEntropiaIndividual(nombreClase, dataSet);
+
+  const entropíaTotalAtributos = calculosEntropíaIndividual.map((item) => {
+    const result = item.entropíasTotales.map((value) => {
+      const cantValorAtributo = item.cantAtributos.find(
+        (key) => key.campo === value.campo
+      );
+      const entropy =
+        (cantValorAtributo.cant / listadoValoresClases.length) *
+        value.entropía;
+      return {
+        campo: value.campo,
+        entropy: entropy,
+      };
+    });
+    const entropía = result
+      .map((item) => item.entropy)
+      .reduce((acc, curr) => {
+        return acc + curr;
+      }, 0);
+    return {
+      atributo: item.atributo,
+      entropía,
+      entropíasIndividuales: item.entropíasTotales,
+    };
+  });
+  return entropíaTotalAtributos
+};
