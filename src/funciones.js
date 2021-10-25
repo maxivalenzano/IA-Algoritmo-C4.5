@@ -194,8 +194,9 @@ export const filterConjunto = (
 };
 
 export const filtradoSegunAtributoGananciaMaxima = (gananciaMax, dataSet) => {
+  const nuevoDataSetSinPuros = reducirTabla(gananciaMax, dataSet);
   return gananciaMax.entropíasIndividuales.map(valor => {
-    const result = dataSet.filter(item => item[gananciaMax.atributo] === valor.campo);
+    const result = nuevoDataSetSinPuros.filter(item => item[gananciaMax.atributo] === valor.campo);
     const filtrados = result.map(fila => omit(fila, gananciaMax.atributo))
     return { valorAtributo: valor.campo, filas: filtrados }
   })

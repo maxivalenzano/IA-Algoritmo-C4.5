@@ -6,7 +6,6 @@ import {
   listadoValoresColumna,
   posicionClase,
   calculoGananciaInformacion,
-  reducirTabla,
   filtradoSegunAtributoGananciaMaxima,
   calcularEntropiaTotalXAtributo
 } from './funciones';
@@ -36,10 +35,7 @@ const DecisionTree = () => {
   const gananciaMaxima = maximoGanancia(calculoGananciaInform);
   // console.log('🚀 ~ file: DecisionTree.jsx ~ line 108 ~ DecisionTree ~ gananciaMaxima', gananciaMaxima);
 
-  const nuevoDataSetSinPuros = reducirTabla(gananciaMaxima, dataSet);
-  // console.log("🚀 ~ file: DecisionTree.jsx ~ line 107 ~ DecisionTree ~ nuevoDataSetSinPuros", nuevoDataSetSinPuros)
-
-  const dataSetForExpansion = filtradoSegunAtributoGananciaMaxima(gananciaMaxima, nuevoDataSetSinPuros)
+  const dataSetForExpansion = filtradoSegunAtributoGananciaMaxima(gananciaMaxima, dataSet)
   console.log("🚀 ~ file: DecisionTree.jsx ~ line 117 ~ dataSetForExpansion", dataSetForExpansion)
 
   //segunda iteracion
@@ -52,12 +48,20 @@ const DecisionTree = () => {
 
     const entropíaConjuntoExpansion = calculoEntropíaConjunto(listadoValoresClasesExpansion);
     // const entropiaAtributosIndividualesExpansion = (dataSetXValorAtributo.filas.length === 0) ? [] : calculoEntropiaIndividual(clase.nombre, dataSetXValorAtributo.filas);
-    const entropíaTotalAtributosExpansion = (dataSetXValorAtributo.filas.length === 0) ? [] : calcularEntropiaTotalXAtributo(clase.nombre, dataSetXValorAtributo.filas)
-
+    const entropíaTotalAtributosExpansion = (dataSetXValorAtributo.filas.length === 0) ? [] : calcularEntropiaTotalXAtributo(clase.nombre, dataSetXValorAtributo.filas);
+    const gananciaInformacionExpansion = (dataSetXValorAtributo.filas.length === 0) ? [] : calculoGananciaInformacion(
+      entropíaTotalAtributosExpansion,
+      entropíaConjuntoExpansion
+    );
+    const gananciaMaximaExpansion = (dataSetXValorAtributo.filas.length === 0) ? [] : maximoGanancia(gananciaInformacionExpansion);
+    const nuevoDataSetSinPurosSexo = (dataSetXValorAtributo.filas.length === 0) ? [] : filtradoSegunAtributoGananciaMaxima(gananciaMaximaExpansion, dataSetXValorAtributo.filas);
     return {
       valorAtributo: dataSetXValorAtributo.valorAtributo,
       entropia: entropíaConjuntoExpansion,
-      entropiaAtributos: entropíaTotalAtributosExpansion
+      entropiaAtributos: entropíaTotalAtributosExpansion,
+      gananciaInformacionExpansion,
+      gananciaMaximaExpansion,
+      nuevoDataSetSinPurosSexo
     }
   });
   console.log("🚀 ~ file: DecisionTree.jsx ~ line 120 ~ DecisionTree ~ sexo", sexo)
