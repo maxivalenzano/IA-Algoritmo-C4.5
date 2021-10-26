@@ -7,24 +7,20 @@ import {
   posicionClase,
   calculoGananciaInformacion,
   filtradoSegunAtributoGananciaMaxima,
-  calcularEntropiaTotalXAtributo
+  calcularEntropiaTotalXAtributo,
 } from './funciones';
 
 const DecisionTree = () => {
-
   const [umbral, setUmbral] = React.useState(0);
   // obtenemos el nombre de la clase
   const clase = posicionClase(dataSet);
 
   // obtenemos un listado de todos los componentes
-  const listadoValoresClases = listadoValoresColumna(
-    dataSet,
-    clase.nombre
-  );
+  const listadoValoresClases = listadoValoresColumna(dataSet, clase.nombre);
   //se calcula la entropía del conjunto para los valores de la clase
   const entropíaConjunto = calculoEntropíaConjunto(listadoValoresClases);
 
-  const entropíaTotalAtributos = calcularEntropiaTotalXAtributo(clase.nombre, dataSet)
+  const entropíaTotalAtributos = calcularEntropiaTotalXAtributo(clase.nombre, dataSet);
 
   const calculoGananciaInform = calculoGananciaInformacion(
     entropíaTotalAtributos,
@@ -35,11 +31,11 @@ const DecisionTree = () => {
   const gananciaMaxima = maximoGanancia(calculoGananciaInform);
   // console.log('🚀 ~ file: DecisionTree.jsx ~ line 108 ~ DecisionTree ~ gananciaMaxima', gananciaMaxima);
 
-  const dataSetForExpansion = filtradoSegunAtributoGananciaMaxima(gananciaMaxima, dataSet)
-  console.log("🚀 ~ file: DecisionTree.jsx ~ line 117 ~ dataSetForExpansion", dataSetForExpansion)
+  const dataSetForExpansion = filtradoSegunAtributoGananciaMaxima(gananciaMaxima, dataSet);
+  console.log('🚀 ~ file: DecisionTree.jsx ~ line 117 ~ dataSetForExpansion', dataSetForExpansion);
 
   //segunda iteracion
-  const sexo = dataSetForExpansion.map(dataSetXValorAtributo => {
+  const sexo = dataSetForExpansion.map((dataSetXValorAtributo) => {
     //calculamos la entropia de los nuevos conjuntos de expansion
     const listadoValoresClasesExpansion = listadoValoresColumna(
       dataSetXValorAtributo.filas,
@@ -48,23 +44,32 @@ const DecisionTree = () => {
 
     const entropíaConjuntoExpansion = calculoEntropíaConjunto(listadoValoresClasesExpansion);
     // const entropiaAtributosIndividualesExpansion = (dataSetXValorAtributo.filas.length === 0) ? [] : calculoEntropiaIndividual(clase.nombre, dataSetXValorAtributo.filas);
-    const entropíaTotalAtributosExpansion = (dataSetXValorAtributo.filas.length === 0) ? [] : calcularEntropiaTotalXAtributo(clase.nombre, dataSetXValorAtributo.filas);
-    const gananciaInformacionExpansion = (dataSetXValorAtributo.filas.length === 0) ? [] : calculoGananciaInformacion(
-      entropíaTotalAtributosExpansion,
-      entropíaConjuntoExpansion
-    );
-    const gananciaMaximaExpansion = (dataSetXValorAtributo.filas.length === 0) ? [] : maximoGanancia(gananciaInformacionExpansion);
-    const nuevoDataSetSinPurosSexo = (dataSetXValorAtributo.filas.length === 0) ? [] : filtradoSegunAtributoGananciaMaxima(gananciaMaximaExpansion, dataSetXValorAtributo.filas);
+    const entropíaTotalAtributosExpansion =
+      dataSetXValorAtributo.filas.length === 0
+        ? []
+        : calcularEntropiaTotalXAtributo(clase.nombre, dataSetXValorAtributo.filas);
+    const gananciaInformacionExpansion =
+      dataSetXValorAtributo.filas.length === 0
+        ? []
+        : calculoGananciaInformacion(entropíaTotalAtributosExpansion, entropíaConjuntoExpansion);
+    const gananciaMaximaExpansion =
+      dataSetXValorAtributo.filas.length === 0
+        ? []
+        : maximoGanancia(gananciaInformacionExpansion);
+    const nuevoDataSetSinPurosSexo =
+      dataSetXValorAtributo.filas.length === 0
+        ? []
+        : filtradoSegunAtributoGananciaMaxima(gananciaMaximaExpansion, dataSetXValorAtributo.filas);
     return {
       valorAtributo: dataSetXValorAtributo.valorAtributo,
       entropia: entropíaConjuntoExpansion,
       entropiaAtributos: entropíaTotalAtributosExpansion,
       gananciaInformacionExpansion,
       gananciaMaximaExpansion,
-      nuevoDataSetSinPurosSexo
-    }
+      nuevoDataSetSinPurosSexo,
+    };
   });
-  console.log("🚀 ~ file: DecisionTree.jsx ~ line 120 ~ DecisionTree ~ sexo", sexo)
+  console.log('🚀 ~ file: DecisionTree.jsx ~ line 120 ~ DecisionTree ~ sexo', sexo);
 
   return (
     <React.Fragment>
