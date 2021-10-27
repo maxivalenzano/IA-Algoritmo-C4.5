@@ -14,26 +14,22 @@ const DecisionTree = () => {
   const [umbral, setUmbral] = React.useState(0);
   // obtenemos el nombre de la clase
   const clase = posicionClase(dataSet);
-
   // obtenemos un listado de todos los componentes
   const listadoValoresClases = listadoValoresColumna(dataSet, clase.nombre);
   //se calcula la entropía del conjunto para los valores de la clase
   const entropíaConjunto = calculoEntropíaConjunto(listadoValoresClases);
-
   const entropíaTotalAtributos = calcularEntropiaTotalXAtributo(clase.nombre, dataSet);
-
   const calculoGananciaInform = calculoGananciaInformacion(
     entropíaTotalAtributos,
     entropíaConjunto
   );
-  // console.log('🚀 ~ file: DecisionTree.jsx ~ line 104 ~ DecisionTree ~ calculoGananciaInform', calculoGananciaInform);
-
   const gananciaMaxima = maximoGanancia(calculoGananciaInform);
-  // console.log('🚀 ~ file: DecisionTree.jsx ~ line 108 ~ DecisionTree ~ gananciaMaxima', gananciaMaxima);
-
   const dataSetForExpansion = filtradoSegunAtributoGananciaMaxima(gananciaMaxima, dataSet);
-  console.log('🚀 ~ file: DecisionTree.jsx ~ line 117 ~ dataSetForExpansion', dataSetForExpansion);
-
+  const nodo = {
+    nodo: gananciaMaxima,
+    dataSet: dataSetForExpansion
+  }
+  console.log('🚀 ~ file: DecisionTree.jsx ~ line 32 ~ DecisionTree ~ primerNodo', nodo);
   //segunda iteracion
   const sexo = dataSetForExpansion.map((dataSetXValorAtributo) => {
     //calculamos la entropia de los nuevos conjuntos de expansion
@@ -41,7 +37,6 @@ const DecisionTree = () => {
       dataSetXValorAtributo.filas,
       clase.nombre
     );
-
     const entropíaConjuntoExpansion = calculoEntropíaConjunto(listadoValoresClasesExpansion);
     // const entropiaAtributosIndividualesExpansion = (dataSetXValorAtributo.filas.length === 0) ? [] : calculoEntropiaIndividual(clase.nombre, dataSetXValorAtributo.filas);
     const entropíaTotalAtributosExpansion =
@@ -69,7 +64,7 @@ const DecisionTree = () => {
       nuevoDataSetSinPurosSexo,
     };
   });
-  console.log('🚀 ~ file: DecisionTree.jsx ~ line 120 ~ DecisionTree ~ sexo', sexo);
+  console.log('🚀 ~ file: DecisionTree.jsx ~ line 67 ~ sexo ~ sexo', sexo);
 
   return (
     <React.Fragment>

@@ -127,6 +127,9 @@ export const calculoEntropíaIndividual = (atributo, cantValorPorAtributo) => {
       return {
         entropíaParcial: entropíaParcial,
         campoAtributo: campoAtributo,
+        campoClase: clase.campoClase,
+        cantTotalXatributo: cantValorAtributo.cant,
+        cantAtributoXClase: key.cant
       };
     });
     return {
@@ -166,6 +169,7 @@ export const calculoGananciaInformacion = (
       atributo: item.atributo,
       ganancia: ganancia,
       entropíasIndividuales: item.entropíasIndividuales,
+      cantXClase: item.cantXclases
     };
   });
 };
@@ -209,6 +213,7 @@ export const calculoEntropiaIndividual = (claseNombre, dataSet) => {
     (item) => item !== claseNombre
   );
 
+  // de esta variable 
   const listadoAtributosSeparadosPorClase = listadoDeAtributosSeparadosPorColumna(
     claseNombre,
     dataSet
@@ -221,6 +226,7 @@ export const calculoEntropiaIndividual = (claseNombre, dataSet) => {
 
   const calculosEntropíaIndividual = listadoAtributosSeparadosPorClase.map(
     (atributo) => {
+      // buscar valores aquí de la cantidad por atributos
       const calculosPorClase = calculoEntropíaIndividual(
         atributo,
         cantValorPorAtributoConst
@@ -229,6 +235,7 @@ export const calculoEntropiaIndividual = (claseNombre, dataSet) => {
       return {
         atributo: atributo.atributo,
         cantAtributos: calculosPorClase[0].atributoTotal,
+        cantXclases: calculosPorClase,
         entropíasTotales: entropíaTotal,
       };
     }
@@ -267,6 +274,7 @@ export const calcularEntropiaTotalXAtributo = (nombreClase, dataSet) => {
       atributo: item.atributo,
       entropía,
       entropíasIndividuales: item.entropíasTotales,
+      cantXclases: item.cantXclases,
     };
   });
   return entropíaTotalAtributos

@@ -1,121 +1,56 @@
-import React, { useState } from 'react';
-import conjuntoEntrenamiento from './conjuntoEntrenamiento2';
+import React from 'react';
 import {
   maximoGanancia,
   calculoEntropíaConjunto,
-  listadoAtributos,
-  posicionClase,
-  nombreID,
-  listadoTituloColumnas,
-  listadoDeAtributosSeparadosPorClase,
-  sumaEntropía,
-  calculoEntropíaIndividual,
-  cantValorPorAtributo,
+  listadoValoresColumna,
   calculoGananciaInformacion,
-  reducirTabla,
-  filterConjunto
+  filtradoSegunAtributoGananciaMaxima,
+  calcularEntropiaTotalXAtributo,
 } from './funciones';
 
-const DecisinoTreeRecursivo = ({umbral, primeraIteracion, setPrimeraIteracion}) => {
+const DecisionTree = () => {
 
-  // obtenemos el nombre de la clase
-  const nombreDeClase = posicionClase(conjuntoEntrenamiento);
-  const nombreDeID = nombreID(conjuntoEntrenamiento);
-  const columnas = listadoTituloColumnas(conjuntoEntrenamiento);
-  const listaAtributos = columnas.filter(
-    (item) => item !== nombreDeID && item !== nombreDeClase.nombre
-  );
-  const onlyAtributos = filterConjunto(conjuntoEntrenamiento, nombreDeClase.nombre, nombreDeID, primeraIteracion);
-  // console.log('🚀 ~ file: DecisinoTreeRecursivo.jsx ~ line 21 ~ DecisinoTreeRecursivo ~ onlyAtributos', onlyAtributos);
-  // obtenemos un listado de todos los componentes
-  const listadoAtributoClases = listadoAtributos(
-    conjuntoEntrenamiento,
-    nombreDeClase.nombre
-  );
-  // clasificamos en nombre y cantidad
-  // const cantidadAtributoClases = cantidadApariciones(listadoAtributoClases);
-  //se calcula la entropía del conjunto para los valores de la clase
-  const entropíaConjunto = calculoEntropíaConjunto(listadoAtributoClases);
+  const sexo = dataSetForExpansion.map((dataSetXValorAtributo) => {
+    //calculamos la entropia de los nuevos conjuntos de expansion
+    const listadoValoresClasesExpansion = listadoValoresColumna(
+      dataSetXValorAtributo.filas,
+      clase.nombre
+    );
 
-  const listadoAtributosSeparadosPorClase = listadoDeAtributosSeparadosPorClase(
-    nombreDeClase,
-    listaAtributos,
-    conjuntoEntrenamiento
-  );
-  // console.log('🚀 ~ file: DecisinoTreeRecursivo.jsx ~ line 37 ~ DecisinoTreeRecursivo ~ listadoAtributosSeparadosPorClase', listadoAtributosSeparadosPorClase);
-
-  const cantValorPorAtributoConst = cantValorPorAtributo(
-    listaAtributos,
-    conjuntoEntrenamiento
-  );
-
-  const calculosEntropíaIndividual = listadoAtributosSeparadosPorClase.map(
-    (atributo) => {
-      const calculosPorClase = calculoEntropíaIndividual(
-        atributo,
-        cantValorPorAtributoConst
-      );
-      const entropíaTotal = sumaEntropía(calculosPorClase);
-      return {
-        atributo: atributo.atributo,
-        cantAtributos: calculosPorClase[0].atributoTotal,
-        // calculosPorClase: calculosPorClase,
-        entropíasTotales: entropíaTotal,
-      };
-    }
-  );
-  // console.log('🚀 ~ file: DecisinoTreeRecursivo.jsx ~ line 37 ~ DecisinoTreeRecursivo ~ calculosEntropíaIndividual', calculosEntropíaIndividual);
-
-  const entropíaTotalAtributos = calculosEntropíaIndividual.map((item) => {
-    const result = item.entropíasTotales.map((value) => {
-      const cantValorAtributo = item.cantAtributos.find(
-        (key) => key.campo === value.campo
-      );
-      const entropy =
-        (cantValorAtributo.cant / listadoAtributoClases.length) *
-        value.entropía;
-      return {
-        campo: value.campo,
-        entropy: entropy,
-      };
-    });
-    const entropía = result
-      .map((item) => item.entropy)
-      .reduce((acc, curr) => {
-        return acc + curr;
-      }, 0);
+    const entropíaConjuntoExpansion = calculoEntropíaConjunto(listadoValoresClasesExpansion);
+    // const entropiaAtributosIndividualesExpansion = (dataSetXValorAtributo.filas.length === 0) ? [] : calculoEntropiaIndividual(clase.nombre, dataSetXValorAtributo.filas);
+    const entropíaTotalAtributosExpansion =
+      dataSetXValorAtributo.filas.length === 0
+        ? []
+        : calcularEntropiaTotalXAtributo(clase.nombre, dataSetXValorAtributo.filas);
+    const gananciaInformacionExpansion =
+      dataSetXValorAtributo.filas.length === 0
+        ? []
+        : calculoGananciaInformacion(entropíaTotalAtributosExpansion, entropíaConjuntoExpansion);
+    const gananciaMaximaExpansion =
+      dataSetXValorAtributo.filas.length === 0
+        ? []
+        : maximoGanancia(gananciaInformacionExpansion);
+    const nuevoDataSetSinPurosSexo =
+      dataSetXValorAtributo.filas.length === 0
+        ? []
+        : filtradoSegunAtributoGananciaMaxima(gananciaMaximaExpansion, dataSetXValorAtributo.filas);
     return {
-      atributo: item.atributo,
-      entropía,
-      entropíasIndividuales: item.entropíasTotales,
+      valorAtributo: dataSetXValorAtributo.valorAtributo,
+      entropia: entropíaConjuntoExpansion,
+      entropiaAtributos: entropíaTotalAtributosExpansion,
+      gananciaInformacionExpansion,
+      gananciaMaximaExpansion,
+      nuevoDataSetSinPurosSexo,
     };
   });
-
-  const calculoGananciaInform = calculoGananciaInformacion(
-    entropíaTotalAtributos,
-    entropíaConjunto
-  );
-
-  const gananciaMaxima = maximoGanancia(calculoGananciaInform);
-  console.log(
-    '🚀 ~ file: DecisinoTreeRecursivo.jsx ~ line 59 ~ DecisinoTreeRecursivo ~ gananciaMaxima',
-    gananciaMaxima
-  );
-
-  const nuevaTabla = reducirTabla(gananciaMaxima, onlyAtributos);
-  console.log(
-    '🚀 ~ file: DecisinoTreeRecursivo.jsx ~ line 130 ~ DecisinoTreeRecursivo ~ nuevaTabla',
-    nuevaTabla
-  );
-  const nuevito = filterConjunto(nuevaTabla, gananciaMaxima.atributo);
-  console.log('🚀 ~ file: DecisinoTreeRecursivo.jsx ~ line 121 ~ DecisinoTreeRecursivo ~ nuevito', nuevito);
+  console.log('🚀 ~ file: DecisionTree.jsx ~ line 120 ~ DecisionTree ~ sexo', sexo);
 
   return (
-    <React.Fragment>
-      <p>Nombre de la clase: {nombreDeClase.nombre}</p>
-      <p>Entropía del conjunto: {entropíaConjunto}</p>
-    </React.Fragment>
+    <>
+      <p>Entropía del conjunto{}: {sexo.entropia}</p>
+    </>
   );
 };
 
-export default DecisinoTreeRecursivo;
+export default DecisionTree;
