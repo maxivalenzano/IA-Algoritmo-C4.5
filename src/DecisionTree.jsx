@@ -16,19 +16,19 @@ const DecisionTree = () => {
   const clase = posicionClase(dataSet);
   // obtenemos un listado de todos los componentes
   const listadoValoresClases = listadoValoresColumna(dataSet, clase.nombre);
-  //se calcula la entropía del conjunto para los valores de la clase
-  const entropíaConjunto = calculoEntropíaConjunto(listadoValoresClases);
-  const entropíaTotalAtributos = calcularEntropiaTotalXAtributo(clase.nombre, dataSet);
+  //se calcula la entropia del conjunto para los valores de la clase
+  const entropiaConjunto = calculoEntropíaConjunto(listadoValoresClases);
+  const entropiaTotalAtributos = calcularEntropiaTotalXAtributo(clase.nombre, dataSet);
   const calculoGananciaInform = calculoGananciaInformacion(
-    entropíaTotalAtributos,
-    entropíaConjunto
+    entropiaTotalAtributos,
+    entropiaConjunto
   );
   const gananciaMaxima = maximoGanancia(calculoGananciaInform);
   const dataSetForExpansion = filtradoSegunAtributoGananciaMaxima(gananciaMaxima, dataSet);
   const nodo = {
     nodo: gananciaMaxima,
-    dataSet: dataSetForExpansion
-  }
+    dataSet: dataSetForExpansion,
+  };
   console.log('🚀 ~ file: DecisionTree.jsx ~ line 32 ~ DecisionTree ~ primerNodo', nodo);
   //segunda iteracion
   const sexo = dataSetForExpansion.map((dataSetXValorAtributo) => {
@@ -37,28 +37,26 @@ const DecisionTree = () => {
       dataSetXValorAtributo.filas,
       clase.nombre
     );
-    const entropíaConjuntoExpansion = calculoEntropíaConjunto(listadoValoresClasesExpansion);
+    const entropiaConjuntoExpansion = calculoEntropíaConjunto(listadoValoresClasesExpansion);
     // const entropiaAtributosIndividualesExpansion = (dataSetXValorAtributo.filas.length === 0) ? [] : calculoEntropiaIndividual(clase.nombre, dataSetXValorAtributo.filas);
-    const entropíaTotalAtributosExpansion =
+    const entropiaTotalAtributosExpansion =
       dataSetXValorAtributo.filas.length === 0
         ? []
         : calcularEntropiaTotalXAtributo(clase.nombre, dataSetXValorAtributo.filas);
     const gananciaInformacionExpansion =
       dataSetXValorAtributo.filas.length === 0
         ? []
-        : calculoGananciaInformacion(entropíaTotalAtributosExpansion, entropíaConjuntoExpansion);
+        : calculoGananciaInformacion(entropiaTotalAtributosExpansion, entropiaConjuntoExpansion);
     const gananciaMaximaExpansion =
-      dataSetXValorAtributo.filas.length === 0
-        ? []
-        : maximoGanancia(gananciaInformacionExpansion);
+      dataSetXValorAtributo.filas.length === 0 ? [] : maximoGanancia(gananciaInformacionExpansion);
     const nuevoDataSetSinPurosSexo =
       dataSetXValorAtributo.filas.length === 0
         ? []
         : filtradoSegunAtributoGananciaMaxima(gananciaMaximaExpansion, dataSetXValorAtributo.filas);
     return {
       valorAtributo: dataSetXValorAtributo.valorAtributo,
-      entropia: entropíaConjuntoExpansion,
-      entropiaAtributos: entropíaTotalAtributosExpansion,
+      entropia: entropiaConjuntoExpansion,
+      entropiaAtributos: entropiaTotalAtributosExpansion,
       gananciaInformacionExpansion,
       gananciaMaximaExpansion,
       nuevoDataSetSinPurosSexo,
@@ -77,7 +75,7 @@ const DecisionTree = () => {
         max={100}
       />
       <p>Nombre de la clase: {clase.nombre}</p>
-      <p>Entropía del conjunto: {entropíaConjunto}</p>
+      <p>Entropía del conjunto: {entropiaConjunto}</p>
     </React.Fragment>
   );
 };

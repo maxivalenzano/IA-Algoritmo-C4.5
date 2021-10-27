@@ -44,7 +44,6 @@ const DecisionTree = () => {
       nuevoDataSetSinPurosSexo,
     };
   });
-  console.log('🚀 ~ file: DecisionTree.jsx ~ line 120 ~ DecisionTree ~ sexo', sexo);
 
   return (
     <>
