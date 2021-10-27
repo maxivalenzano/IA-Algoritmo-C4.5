@@ -16,7 +16,7 @@ const DecisionTree = () => {
 
   const expansion = (dataSet) => {
     if (dataSet.length === 0) {
-      return [];
+      return {};
     }
     const clase = posicionClase(dataSet);
     const listadoValoresClases = listadoValoresColumna(dataSet, clase.nombre);
@@ -33,7 +33,7 @@ const DecisionTree = () => {
       dataSet: dataSetForExpansion,
     };
     console.log('🚀 ~ file: DecisionTree.jsx ~ line 36 ~ expansion ~ nodo', nodo);
-    nodo.dataSet.map((rama) => {
+    const listadoDataSetsForExpansion = nodo.dataSet.map((rama) => {
       if (rama.filas.length === 0) {
         console.log(
           'nodo: ',
@@ -44,9 +44,16 @@ const DecisionTree = () => {
           rama.nodoPuro.campoClase
         );
         return [];
-      } else return expansion(rama.filas);
+      } else return rama.filas;
     });
-  
+    console.log(
+      '🚀 ~ file: DecisionTree.jsx ~ line 38 ~ expansion ~ listadoDataSetsForExpansion',
+      listadoDataSetsForExpansion
+    );
+
+    listadoDataSetsForExpansion.map((dataSet, index) => {
+      return expansion(dataSet);
+    });
   };
   expansion(dataSet);
 
