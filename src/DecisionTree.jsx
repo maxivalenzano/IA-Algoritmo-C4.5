@@ -13,10 +13,11 @@ import {
 const DecisionTree = () => {
   const [umbral, setUmbral] = React.useState(0);
   // obtenemos el nombre de la clase
-
+  let tree = {};
   const expansion = (dataSet) => {
+  console.log('🚀 ~ file: DecisionTree.jsx ~ line 18 ~ expansion ~ dataSet', dataSet);
     if (dataSet.length === 0) {
-      return {};
+      return console.log("alóo");
     }
     const clase = posicionClase(dataSet);
     const listadoValoresClases = listadoValoresColumna(dataSet, clase.nombre);
@@ -32,7 +33,7 @@ const DecisionTree = () => {
       nodo: gananciaMaxima,
       dataSet: dataSetForExpansion,
     };
-    console.log('🚀 ~ file: DecisionTree.jsx ~ line 36 ~ expansion ~ nodo', nodo);
+    // console.log('🚀 ~ file: DecisionTree.jsx ~ line 36 ~ expansion ~ nodo', nodo);
     const listadoDataSetsForExpansion = nodo.dataSet.map((rama) => {
       if (rama.filas.length === 0) {
         console.log(
@@ -43,19 +44,39 @@ const DecisionTree = () => {
           ', es un nodo puro de clase: ',
           rama.nodoPuro.campoClase
         );
+        tree[rama.valorAtributo] = { 
+          ...tree[rama.valorAtributo],
+          [rama.valorAtributo]: rama.nodoPuro.campoClase  } || {}
+        // console.log('🚀 ~ file: DecisionTree.jsx ~ line 47 ~ listadoDataSetsForExpansion ~ tree[nodo.nodo.atributo]', tree[nodo.nodo.atributo]);
         return [];
-      } else return rama.filas;
+      } else {
+        // tree[nodo.nodo.atributo] = { ...tree[nodo.nodo.atributo[rama.valorAtributo[rama.nodoPuro.campoClase]]] } || {}
+        // console.log(
+        //   'nodo: ',
+        //   nodo.nodo.atributo,
+        //   ', atributo tipo: ',
+        //   rama.valorAtributo,
+        //   ', es un nodo puro de clase: ',
+        //   rama.nodoPuro.campoClase
+        // );
+        // tree[nodo.nodo.atributo] = { ...tree[nodo.nodo.atributo][rama.valorAtributo] } || { ok: 'ok' }
+        return rama.filas
+      };
     });
     console.log(
       '🚀 ~ file: DecisionTree.jsx ~ line 38 ~ expansion ~ listadoDataSetsForExpansion',
       listadoDataSetsForExpansion
     );
 
-    listadoDataSetsForExpansion.map((dataSet, index) => {
+    listadoDataSetsForExpansion.map((dataSet) => {
+      if (dataSet.length === 0) {
+        return null
+      }
       return expansion(dataSet);
     });
   };
   expansion(dataSet);
+  console.log('🚀 ~ file: DecisionTree.jsx ~ line 17 ~ DecisionTree ~ tree', tree);
 
   return (
     <React.Fragment>
