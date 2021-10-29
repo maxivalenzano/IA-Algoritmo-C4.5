@@ -52,12 +52,16 @@ const DecisionTree = () => {
       nodo.ramas[0]?.nodo
         ? {
             name: nodo.ramas[0]?.nodo,
-            valorAtributo: nodo.valorAtributo,
+            attributes: {
+              department: nodo.valorAtributo,
+            },
             children: recursiveData(nodo.ramas),
           }
         : {
-            nodoPuro: true,
-            valorAtributo: nodo.valorAtributo,
+            name: `xClase: ${nodo.nodoPuro.campoClase}`,
+            attributes: {
+              department: nodo.valorAtributo,
+            },
             children: recursiveData(nodo.ramas),
           }
     );
@@ -74,12 +78,16 @@ const DecisionTree = () => {
         nodo.ramas[0]?.nodo
           ? {
               name: nodo.ramas[0]?.nodo,
-              valorAtributo: nodo.valorAtributo,
+              attributes: {
+                department: nodo.valorAtributo,
+              },
               children: recursive2(nodo.ramas),
             }
           : {
-              nodoPuro: true,
-              valorAtributo: nodo.valorAtributo,
+              name: `xClase: ${nodo.nodoPuro.campoClase}`,
+              attributes: {
+                department: nodo.valorAtributo,
+              },
               children: recursive2(nodo.ramas),
             }
       ),
