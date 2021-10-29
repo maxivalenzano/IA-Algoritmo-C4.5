@@ -15,6 +15,7 @@ import {
   reducirTabla,
   filterConjunto,
 } from './funciones';
+import './styles.css';
 
 const DecisionTree = () => {
   const [umbral, setUmbral] = React.useState(0);
@@ -121,16 +122,18 @@ const DecisionTree = () => {
 
   return (
     <React.Fragment>
-      <p>Ingrese Umbral: </p>
-      <input
-        value={umbral}
-        onChange={(e) => setUmbral(e.target.value)}
-        type="number"
-        min={1}
-        max={100}
-      />
-      <p>Nombre de la clase: {nombreDeClase.nombre}</p>
-      <p>Entropía del conjunto: {entropíaConjunto}</p>
+          <div type="number" className="form-control-plaintext hola">
+          <p>Ingrese Umbral: </p>
+              <input
+                  required
+                  cssClass="box"
+                value={umbral}
+                onChange={(e) => setUmbral(e.target.value)}
+                type="number"
+                min={1}
+                //max={100}
+              />
+           </div>
     </React.Fragment>
   );
 };
