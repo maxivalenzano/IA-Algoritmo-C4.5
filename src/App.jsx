@@ -12,6 +12,14 @@ const Footer = () => (
     </footer>
 );
 
+
+       function validar()  {
+      var elemento = document.getElementById("exampleFormControlFile1").value
+      if (elemento === ""){
+        return alert("Debes llenar el campo")
+      }
+    } 
+
 const App = () => {
   const handleForce = (data, fileInfo) => console.log(data, fileInfo);
   const papaparseOptions = {
@@ -20,7 +28,10 @@ const App = () => {
     skipEmptyLines: true,
     transformHeader: (header) => header.toLowerCase().replace(/\W/g, '_'),
   };
+ 
     return (
+     
+
         <div className="container">
             <div>
                 <p className='f1'>
@@ -32,19 +43,20 @@ const App = () => {
 <form>
   <div class="form-group">
     <label for="exampleFormControlFile1">Ingrese un archivo CSV:</label>
-    <input type="file" class="form-control-file" id="exampleFormControlFile1"/>
+    <input type="file" accept=".txt, .csv" class="form-control-file" id="exampleFormControlFile1" onclick="" required/>
   </div>
-</form>
+
             
             
                 <DecisionTree />
             
             <div className="container3">
-              <Link to="/Page2">
-              <Example /> </Link >
+             
+              <Example />
             </div>
+            
+            </form>
             </div>
-          
            <Footer />
         </div>
     );

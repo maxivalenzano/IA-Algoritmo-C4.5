@@ -19,7 +19,7 @@ export const nombreID = (datos) => {
 };
 
 // devuelve un listado con todos los campos de la fila dada
-export const listadoAtributos = (datos, nombreColumna) => {
+export const listadoValoresColumna = (datos, nombreColumna) => {
   return datos.map((item) => item[nombreColumna]);
 };
 
@@ -43,39 +43,28 @@ export const cantidadApariciones = (arr) => {
   return object;
 };
 
-// devuelve la entropía del conjunto
+// devuelve la entropia del conjunto
 export const calculoEntropíaConjunto = (columna) => {
   const columnaClase = cantidadApariciones(columna);
   const cantAtrib = columna.length;
-  let entropía = 0;
+  let entropia = 0;
   columnaClase.forEach((item) => {
-    entropía =
-      entropía + -1 * (item.cant / cantAtrib) * log2(item.cant / cantAtrib);
+    entropia = entropia + -1 * (item.cant / cantAtrib) * log2(item.cant / cantAtrib);
   });
-  return entropía;
+  return entropia;
 };
 
-export const listadoDeAtributosSeparadosPorClase = (
-  nombreColumna,
-  listaAtributos,
-  conjuntoDeDatos
-) => {
-  const cantidadAtributoClases = cantidadApariciones(
-    listadoAtributos(conjuntoDeDatos, nombreColumna.nombre)
-  );
+export const listadoDeAtributosSeparadosPorColumna = (nombreColumna, dataSet) => {
+  const columnas = listadoTituloColumnas(dataSet);
+  const listaAtributos = columnas.filter((item) => item !== nombreColumna);
+  const cantidadAtributoClases = cantidadApariciones(listadoValoresColumna(dataSet, nombreColumna));
   return listaAtributos.map((atributo) => {
     const filtradoSegunClase = cantidadAtributoClases.map((clase) => {
-      const listadoCamposClase = conjuntoDeDatos.filter(
-        (item) => item[nombreColumna.nombre] === clase.campo
-      );
-      const listadoAtributosSeparadoPorClase = listadoCamposClase.map(
-        (item) => {
-          return item[atributo];
-        }
-      );
-      const aparicionesAtributo = cantidadApariciones(
-        listadoAtributosSeparadoPorClase
-      );
+      const listadoCamposClase = dataSet.filter((item) => item[nombreColumna] === clase.campo);
+      const listadoAtributosSeparadoPorClase = listadoCamposClase.map((item) => {
+        return item[atributo];
+      });
+      const aparicionesAtributo = cantidadApariciones(listadoAtributosSeparadoPorClase);
       return {
         campoClase: clase.campo,
         cantCampoClase: listadoCamposClase.length,
@@ -91,17 +80,17 @@ export const listadoDeAtributosSeparadosPorClase = (
 };
 
 export const sumaEntropía = (calculosPorClase) => {
-  let entropíasTotales = {};
+  let entropiasTotales = {};
   calculosPorClase.forEach((item) => {
-    item.entropías.forEach((campo) => {
-      entropíasTotales[campo.campoAtributo] =
-        (entropíasTotales[campo.campoAtributo] || 0) + campo.entropíaParcial;
+    item.entropias.forEach((campo) => {
+      entropiasTotales[campo.campoAtributo] =
+        (entropiasTotales[campo.campoAtributo] || 0) + campo.entropiaParcial;
     });
   });
-  const entropyToObject = Object.entries(entropíasTotales).map((item) => {
+  const entropyToObject = Object.entries(entropiasTotales).map((item) => {
     return {
       campo: item[0],
-      entropía: item[1],
+      entropia: item[1],
     };
   });
   return entropyToObject;
@@ -109,26 +98,23 @@ export const sumaEntropía = (calculosPorClase) => {
 
 export const calculoEntropíaIndividual = (atributo, cantValorPorAtributo) => {
   return atributo.filtradoSegunClase.map((clase) => {
-    const atributoTotal = cantValorPorAtributo.find(
-      (item) => item.atributo === atributo.atributo
-    );
+    const atributoTotal = cantValorPorAtributo.find((item) => item.atributo === atributo.atributo);
     const result = clase.atributos.map((key) => {
-      const cantValorAtributo = atributoTotal.cant.find(
-        (value) => value.campo === key.campo
-      );
+      const cantValorAtributo = atributoTotal.cant.find((value) => value.campo === key.campo);
       const campoAtributo = key.campo;
-      const entropíaParcial =
-        -1 *
-        ((key.cant / cantValorAtributo.cant) *
-          log2(key.cant / cantValorAtributo.cant));
+      const entropiaParcial =
+        -1 * ((key.cant / cantValorAtributo.cant) * log2(key.cant / cantValorAtributo.cant));
       return {
-        entropíaParcial: entropíaParcial,
+        entropiaParcial: entropiaParcial,
         campoAtributo: campoAtributo,
+        campoClase: clase.campoClase,
+        cantTotalXatributo: cantValorAtributo.cant,
+        cantAtributoXClase: key.cant,
       };
     });
     return {
       campoClase: clase.campoClase,
-      entropías: result,
+      entropias: result,
       atributoTotal: atributoTotal.cant,
     };
   });
@@ -136,9 +122,7 @@ export const calculoEntropíaIndividual = (atributo, cantValorPorAtributo) => {
 
 export const cantValorPorAtributo = (listaAtributos, conjuntoDeDatos) => {
   return listaAtributos.map((atributo) => {
-    const result = cantidadApariciones(
-      listadoAtributos(conjuntoDeDatos, atributo)
-    );
+    const result = cantidadApariciones(listadoValoresColumna(conjuntoDeDatos, atributo));
     return {
       cant: result,
       atributo: atributo,
@@ -153,45 +137,106 @@ export const maximoGanancia = (conjunto) => {
   return busqueda;
 };
 
-export const calculoGananciaInformacion = (
-  entropíaTotalAtributos,
-  entropíaConjunto
-) => {
-  return entropíaTotalAtributos.map((item) => {
-    const ganancia = entropíaConjunto - item.entropía;
+export const calculoGananciaInformacion = (entropiaTotalAtributos, entropiaConjunto) => {
+  return entropiaTotalAtributos.map((item) => {
+    const ganancia = entropiaConjunto - item.entropia;
     return {
       atributo: item.atributo,
       ganancia: ganancia,
-      entropíasIndividuales: item.entropíasIndividuales,
+      entropiasIndividuales: item.entropiasIndividuales,
+      cantXClase: item.cantXclases,
     };
   });
 };
 
 export const reducirTabla = (gananciaMax, atributos) => {
-  const camposPuros = gananciaMax.entropíasIndividuales
-    .filter((item) => item.entropía === 0)
+  let nuevoDataSet = atributos;
+  const camposPuros = gananciaMax.entropiasIndividuales
+    .filter((item) => item.entropia === 0)
     .map((item) => item.campo);
-  let tablaSinCamposPuros = atributos;
   if (camposPuros.length) {
-    tablaSinCamposPuros = atributos.filter(
-      (item) => !camposPuros.includes(item[gananciaMax.atributo])
-    );
+    nuevoDataSet = atributos.filter((item) => !camposPuros.includes(item[gananciaMax.atributo]));
   }
-  return tablaSinCamposPuros;
+  return nuevoDataSet;
 };
 
-export const filterConjunto = (
-  conjunto,
-  clase,
-  id = '',
-  firstIteracion = false
-) => {
-  const filtered = firstIteracion
-    ? conjunto.map((item) => {
-        return omit(item, [id, clase]);
-      })
-    : conjunto.map((item) => {
-        return omit(item, clase);
-      });
+export const filterConjunto = (conjunto, clase) => {
+  const filtered = conjunto.map((item) => {
+    return omit(item, clase);
+  });
   return filtered;
+};
+
+export const filtradoSegunAtributoGananciaMaxima = (gananciaMax, dataSet) => {
+  const nuevoDataSetSinPuros = reducirTabla(gananciaMax, dataSet);
+  return gananciaMax.entropiasIndividuales.map((valor) => {
+    const result = nuevoDataSetSinPuros.filter(
+      (item) => item[gananciaMax.atributo] === valor.campo
+    );
+
+    let campoPuro = {};
+    if (result.length === 0) {
+      const busqueda = gananciaMax.cantXClase.find((campoClase) =>
+        campoClase.entropias?.find((campoAtributo) => campoAtributo.campoAtributo === valor.campo)
+      );
+      campoPuro = busqueda.entropias.find((item) => item.campoAtributo === valor.campo);
+    }
+    const filtrados = result.map((fila) => omit(fila, gananciaMax.atributo));
+    return { valorAtributo: valor.campo, filas: filtrados, nodoPuro: campoPuro };
+  });
+};
+
+export const calculoEntropiaIndividual = (claseNombre, dataSet) => {
+  const columnas = listadoTituloColumnas(dataSet);
+  const listaAtributos = columnas.filter((item) => item !== claseNombre);
+
+  // de esta variable
+  const listadoAtributosSeparadosPorClase = listadoDeAtributosSeparadosPorColumna(
+    claseNombre,
+    dataSet
+  );
+
+  const cantValorPorAtributoConst = cantValorPorAtributo(listaAtributos, dataSet);
+
+  const calculosEntropíaIndividual = listadoAtributosSeparadosPorClase.map((atributo) => {
+    // buscar valores aquí de la cantidad por atributos
+    const calculosPorClase = calculoEntropíaIndividual(atributo, cantValorPorAtributoConst);
+    const entropiaTotal = sumaEntropía(calculosPorClase);
+    return {
+      atributo: atributo.atributo,
+      cantAtributos: calculosPorClase[0].atributoTotal,
+      cantXclases: calculosPorClase,
+      entropiasTotales: entropiaTotal,
+    };
+  });
+  return calculosEntropíaIndividual;
+};
+
+export const calcularEntropiaTotalXAtributo = (nombreClase, dataSet) => {
+  const listadoValoresClases = listadoValoresColumna(dataSet, nombreClase);
+
+  const calculosEntropíaIndividual = calculoEntropiaIndividual(nombreClase, dataSet);
+
+  const entropiaTotalAtributos = calculosEntropíaIndividual.map((item) => {
+    const result = item.entropiasTotales.map((value) => {
+      const cantValorAtributo = item.cantAtributos.find((key) => key.campo === value.campo);
+      const entropy = (cantValorAtributo.cant / listadoValoresClases.length) * value.entropia;
+      return {
+        campo: value.campo,
+        entropy: entropy,
+      };
+    });
+    const entropia = result
+      .map((item) => item.entropy)
+      .reduce((acc, curr) => {
+        return acc + curr;
+      }, 0);
+    return {
+      atributo: item.atributo,
+      entropia,
+      entropiasIndividuales: item.entropiasTotales,
+      cantXclases: item.cantXclases,
+    };
+  });
+  return entropiaTotalAtributos;
 };
