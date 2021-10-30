@@ -1,71 +1,47 @@
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 import { Container, Button} from 'react-bootstrap';
-
 import './styles.css';
 
-
-            
- const validar =() =>  {
-      var elemento = document.getElementById("exampleFormControlFile1").value
-      var elemento2 = document.getElementById("inputUmbral").value
-      if (elemento === "" || elemento2 === ""){
+//Valida que estén ambos parámetros     
+const validar =() =>  {
+      var elementoCSV = document.getElementById("exampleFormControlFile1").value
+      var elementoUmbral = document.getElementById("inputUmbral").value
+      if (elementoCSV === "" || elementoUmbral === ""){
         return false
-       
       }
       return true
     } 
 
-function PopUp() {
-    <body>
-    <p><a href="#popup"></a></p>
-    <div id="popup" class="overlay">
-    <div id="popupBody">
-        <h2>Título de la ventana</h2>
-        <a id="cerrar" href="#">&times;</a>
-        <div class="popupContent">
-            <p>Este es el contenido</p>
-        </div>  
-    </div>
-    </div>
-</body>
-
-}
-    
+//Función que, en caso de validar correctamente, lleva a la proxima página. Caso contrario, muestra una alerta.
     function nextPage() {
         if(validar()) {
             window.location.href = "./Page2"
-
         }
         else{
-            PopUp()
-                 
+           alert("Debe ingresar ambos valores")    
         }
     }
     
-function Example() {
-    
-    
+
+//Función que renderiza el boton de cargar los datos
+function BotonCargar() {
     return (
-       
-        <Container style={{ paddingTop: '2rem' , paddingLeft: '3rem'}}>
-            
+        <Container style={{ paddingTop: '2rem' , paddingLeft: '35rem'}}>
                 <Button 
                     onClick={ nextPage}
                     size="lg"
-                    
                 >
                     Cargar datos
                 </Button>
       
-        
         </Container>
     );
 }
 
 ReactDOM.render(
-    <Example />,
+    <BotonCargar />,
     document.getElementById('root')
 );
 
-export default Example;
+export default BotonCargar;
