@@ -1,6 +1,7 @@
 import React from 'react';
 import CSVReader from 'react-csv-reader';
 import DecisionTree from './DecisionTree';
+import DecisionTreeTasaGanancia from './DecisionTreeTasaGanancia';
 import './styles.css';
 
 const App = () => {
@@ -19,6 +20,7 @@ const App = () => {
         onFileLoaded={handleForce}
         parserOptions={papaparseOptions}
       />
+      <DecisionTreeTasaGanancia />
       <DecisionTree />
     </div>
   );

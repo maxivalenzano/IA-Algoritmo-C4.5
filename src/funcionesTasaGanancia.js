@@ -25,7 +25,7 @@ export const listadoValoresColumna = (datos, nombreColumna) => {
 
 // devuelve log en base 2
 export const log2 = (n) => {
-  return Math.log(n) / Math.log(2);
+  return Math.log(n) / Math.log(3);
 };
 
 export const logN = (n, m) => {
@@ -151,11 +151,29 @@ export const maximoGanancia = (conjunto) => {
 };
 
 export const calculoGananciaInformacion = (entropiaTotalAtributos, entropiaConjunto) => {
+console.log('🚀 ~ file: funcionesTasaGanancia.js ~ line 154 ~ calculoGananciaInformacion ~ entropiaConjunto', entropiaConjunto);
+console.log('🚀 ~ file: funcionesTasaGanancia.js ~ line 154 ~ calculoGananciaInformacion ~ entropiaTotalAtributos', entropiaTotalAtributos);
   return entropiaTotalAtributos.map((item) => {
+    const atributosTotales = item.cantXclases[0].atributoTotal;
+    console.log('🚀 ~ file: funcionesTasaGanancia.js ~ line 158 ~ atributos',item.atributo, ', atributosTotales:', atributosTotales);
+    const cantValoresClase = atributosTotales.reduce((acc, curr) => {
+      return acc + curr.cant;
+    }, 0);
+    console.log('🚀 ~ file: funcionesTasaGanancia.js ~ line 162 ~ cantValoresClase', cantValoresClase);
+    
+    const denominadorTG = atributosTotales.reduce((acc, curr) => {
+      const termino = (-1*(curr.cant/cantValoresClase)*log2(curr.cant/cantValoresClase))
+      console.log('🚀 ~ file: funcionesTasaGanancia.js ~ line 166 ~ denominadorTG ~ termino', termino);
+      return acc + termino;
+    }, 0);
     const ganancia = entropiaConjunto - item.entropia;
+    console.log('🚀 ~ file: funcionesTasaGanancia.js ~ line 169 ~ ganancia', ganancia);
+    console.log('🚀 ~ file: funcionesTasaGanancia.js ~ line 167 ~ denominadorTG', denominadorTG);
+    console.log('🚀 ~ file: funcionesTasaGanancia.js ~ line 167 ~ Tasa Ganancia', (ganancia/denominadorTG));
+
     return {
       atributo: item.atributo,
-      ganancia: ganancia,
+      ganancia: (ganancia/denominadorTG) ? (ganancia/denominadorTG) : 0,
       entropiasIndividuales: item.entropiasIndividuales,
       cantXClase: item.cantXclases,
     };
@@ -291,15 +309,18 @@ export const expansionAlgoritmo = (dataSet) => {
   }
   const listadoValoresClases = listadoValoresColumna(dataSet, clase.nombre);
   const entropiaConjunto = calculoEntropíaConjunto(listadoValoresClases);
+  console.log('🚀 ~ file: funcionesTasaGanancia.js ~ line 294 ~ expansionAlgoritmo ~ entropiaConjunto', entropiaConjunto);
   // caso base, si nodo es puro
   if (entropiaConjunto === 0) {
     return [];
   }
   const entropiaTotalAtributos = calcularEntropiaTotalXAtributo(clase.nombre, dataSet);
+  console.log('🚀 ~ file: funcionesTasaGanancia.js ~ line 300 ~ expansionAlgoritmo ~ entropiaTotalAtributos', entropiaTotalAtributos);
   const calculoGananciaInform = calculoGananciaInformacion(
     entropiaTotalAtributos,
     entropiaConjunto
   );
+  console.log('🚀 ~ file: funcionesTasaGanancia.js ~ line 305 ~ expansionAlgoritmo ~ calculoGananciaInform', calculoGananciaInform);
   const gananciaMaxima = maximoGanancia(calculoGananciaInform);
   const dataSetForExpansion = filtradoSegunAtributoGananciaMaxima(
     gananciaMaxima,
@@ -322,20 +343,16 @@ export const recursive2 = (datos) => {
     return [];
   }
   return datos.map((nodo) => {
-    const nameNodo = nodo.ramas[0]?.nodo
-      ? `Nodo: ${nodo.ramas[0]?.nodo}`
-      : nodo.nodoPuro.campoClase
-      ? `valorClase: ${nodo.nodoPuro.campoClase}`
-      : 'NodoImpuro';
-    return nodo.ramas.length === 0
+    return nodo.ramas[0]?.nodo
       ? {
-          name: nameNodo,
+          name: `Nodo: ${nodo.ramas[0]?.nodo}`,
           attributes: {
             department: nodo.valorAtributo,
           },
+          children: recursive2(nodo.ramas),
         }
       : {
-          name: nameNodo,
+          name: nodo.nodoPuro.campoClase ? `valorClase: ${nodo.nodoPuro.campoClase}` : 'NodoImpuro',
           attributes: {
             department: nodo.valorAtributo,
           },
@@ -350,31 +367,27 @@ export const recursiveData = (datos) => {
   }
   return {
     name: datos[0].nodo,
-    children: datos.map((nodo) => {
-      const nameNodo = nodo.ramas[0]?.nodo
-        ? `Nodo: ${nodo.ramas[0]?.nodo}`
-        : nodo.nodoPuro.campoClase
-        ? `valorClase: ${nodo.nodoPuro.campoClase}`
-        : 'NodoImpuro';
-      return nodo.ramas.length === 0
+    children: datos.map((nodo) =>
+      nodo.ramas[0]?.nodo
         ? {
-            name: nameNodo,
-            attributes: {
-              department: nodo.valorAtributo,
-            },
-          }
-        : {
-            name: nameNodo,
+            name: `Nodo: ${nodo.ramas[0]?.nodo}`,
             attributes: {
               department: nodo.valorAtributo,
             },
             children: recursive2(nodo.ramas),
-          };
-    }),
+          }
+        : {
+            name: nodo.nodoPuro.campoClase ? `valorClase: ${nodo.nodoPuro.campoClase}` : 'NodoImpuro',
+            attributes: {
+              department: nodo.valorAtributo,
+            },
+            children: recursive2(nodo.ramas),
+          }
+    ),
   };
 };
 
 export const calcularC45 = (dataSet) => {
   const data = expansionAlgoritmo(dataSet);
-  return recursiveData(data);
-};
+  return recursiveData(data)
+}

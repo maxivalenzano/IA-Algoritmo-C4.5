@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import dataSet from './conjuntoEntrenamiento6';
-import { calcularC45 } from './funciones';
+import { calcularC45 } from './funcionesTasaGanancia';
 import Tree from 'react-d3-tree';
 import { useCenteredTree } from './helpers';
 import './styles.css';
@@ -14,16 +14,10 @@ const containerStyles = {
 // as an SVG `rect` instead of the default `circle`.
 const renderRectSvgNode = ({ nodeDatum, toggleNode }) => (
   <g>
-    <circle r="15" x="-10" onClick={toggleNode} />
-    {nodeDatum.name === 'NodoImpuro' ? (
-      <text fill="red" strokeWidth="1" x="20">
-        {nodeDatum.name}
-      </text>
-    ) : (
-      <text fill="black" strokeWidth="1" x="20">
-        {nodeDatum.name}
-      </text>
-    )}
+    <rect width="20" height="20" x="-10" onClick={toggleNode} />
+    <text fill="black" strokeWidth="1" x="20">
+      {nodeDatum.name}
+    </text>
     {nodeDatum.attributes?.department && (
       <>
         <text fill="black" x="20" dy="20" strokeWidth="1">
@@ -43,12 +37,13 @@ const DecisionTree = () => {
 
   useEffect(() => {
     setJsonGraph(calcularC45(dataSet));
+    // const datosCalculados = ;
   }, []);
   console.log('🚀 ~ file', jsonGraph);
 
   return (
     <React.Fragment>
-      <p>Con ganancia de Información:</p>
+      <p>Con Tasa de Ganancia:</p>
       <div style={containerStyles} ref={containerRef}>
         <Tree
           data={jsonGraph}
