@@ -324,14 +324,14 @@ export const recursive2 = (datos) => {
   return datos.map((nodo) => {
     return nodo.ramas[0]?.nodo
       ? {
-          name: nodo.ramas[0]?.nodo,
+          name: `Nodo: ${nodo.ramas[0]?.nodo}`,
           attributes: {
             department: nodo.valorAtributo,
           },
           children: recursive2(nodo.ramas),
         }
       : {
-          name: nodo.nodoPuro.campoClase ? `NodoPuro: ${nodo.nodoPuro.campoClase}` : 'NodoImpuro',
+          name: nodo.nodoPuro.campoClase ? `valorClase: ${nodo.nodoPuro.campoClase}` : 'NodoImpuro',
           attributes: {
             department: nodo.valorAtributo,
           },
@@ -349,14 +349,14 @@ export const recursiveData = (datos) => {
     children: datos.map((nodo) =>
       nodo.ramas[0]?.nodo
         ? {
-            name: nodo.ramas[0]?.nodo,
+            name: `Nodo: ${nodo.ramas[0]?.nodo}`,
             attributes: {
               department: nodo.valorAtributo,
             },
             children: recursive2(nodo.ramas),
           }
         : {
-            name: nodo.nodoPuro.campoClase ? `NodoPuro: ${nodo.nodoPuro.campoClase}` : 'NodoImpuro',
+            name: nodo.nodoPuro.campoClase ? `valorClase: ${nodo.nodoPuro.campoClase}` : 'NodoImpuro',
             attributes: {
               department: nodo.valorAtributo,
             },
