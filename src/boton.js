@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 import { Container, Button} from 'react-bootstrap';
+import swal from 'sweetalert';
 import './styles.css';
 
 //Valida que estén ambos parámetros     
@@ -19,7 +20,9 @@ const validar =() =>  {
             window.location.href = "./Page2"
         }
         else{
-           alert("Debe ingresar ambos valores")    
+            swal({
+                text: "Debes ingresar ambos parámetros",
+            });   
         }
     }
     
@@ -30,6 +33,7 @@ function BotonCargar() {
         <Container style={{ paddingTop: '2rem' , paddingLeft: '35rem'}}>
                 <Button 
                     onClick={ nextPage}
+                    // onChange={(e) => setCSV(e.target.value)}
                     size="lg"
                 >
                     Cargar datos

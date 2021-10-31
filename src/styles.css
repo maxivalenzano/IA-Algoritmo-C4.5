@@ -94,3 +94,10 @@
     left: 0px;
 }
 
+.botones-page2 {
+  display: flex;
+}
+
+.boton-page2 {
+  width: 373px;
+}

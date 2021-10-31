@@ -109,6 +109,7 @@ const DecisionTree = () => {
                   cssClass="box"
                // value={umbral}
                // onChange={(e) => setUmbral(e.target.value)}
+               
                 type="number"
                 min={1}
                 id="inputUmbral"

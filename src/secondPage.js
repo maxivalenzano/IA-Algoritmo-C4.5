@@ -4,27 +4,29 @@ import { Container, Button} from 'react-bootstrap';
 
 function App2 () {
     return (
-        <Container style={{ paddingTop: '2rem' , paddingLeft: '40rem'}}>
-                <Button
-                   // onClick={ }
+        <Container className="botones-page2">
+                <a href="javascript: history.go(-1)">
+                <Button 
+                    className="boton-page2" 
                     size="lg"
                 >
                     Regresar al menú principal
-                </Button>
+                </Button></a>
                 <Button
-                   // onClick={ }
+                    className="boton-page2" 
                     size="lg"
                 >
                     Mostrar paso siguiente
                 </Button>
                 <Button
-                   // onClick={ }
+                    className="boton-page2" 
                     size="lg"
                 >
                     Mostrar árboles completos
                 </Button>
                 <Button
-                   // onClick={ }
+                    className="boton-page2" 
+                    type = "reset"
                     size="lg"
                 >
                     Resetear gráficos
