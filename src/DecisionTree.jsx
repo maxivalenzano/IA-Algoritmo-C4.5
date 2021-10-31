@@ -1,5 +1,5 @@
 import React from "react";
-import dataSet from "./conjuntoEntrenamiento2";
+import dataSet from "./conjuntoEntrenamiento4";
 import {
   maximoGanancia,
   calculoEntropíaConjunto,
@@ -12,32 +12,50 @@ import {
 
 const DecisionTree = () => {
   const expansion = (dataSet) => {
+  console.log('🚀 ~ --------------------------------------------------------------', dataSet);
+    // caso base
     if (dataSet.length === 0) {
       return [];
     }
     const clase = posicionClase(dataSet);
+    // caso base, si nodo Impuro
+    if (clase.index === 0) {
+      return [];
+    }
     const listadoValoresClases = listadoValoresColumna(dataSet, clase.nombre);
     const entropiaConjunto = calculoEntropíaConjunto(listadoValoresClases);
+    console.log('🚀 ~ file: DecisionTree.jsx ~ line 24 ~ expansion ~ entropiaConjunto', entropiaConjunto);
+    if (entropiaConjunto === 0) {
+      return [];
+    }
     const entropiaTotalAtributos = calcularEntropiaTotalXAtributo(
       clase.nombre,
       dataSet
     );
+    // console.log('🚀 ~ file: DecisionTree.jsx ~ line 29 ~ expansion ~ entropiaTotalAtributos', entropiaTotalAtributos);
     const calculoGananciaInform = calculoGananciaInformacion(
       entropiaTotalAtributos,
       entropiaConjunto
     );
+    console.log('🚀 ~ file: DecisionTree.jsx ~ line 34 ~ expansion ~ calculoGananciaInform', calculoGananciaInform);
     const gananciaMaxima = maximoGanancia(calculoGananciaInform);
+    console.log('🚀 ~ file: DecisionTree.jsx ~ line 36 ~ expansion ~ gananciaMaxima', gananciaMaxima);
     const dataSetForExpansion = filtradoSegunAtributoGananciaMaxima(
       gananciaMaxima,
-      dataSet
+      dataSet,
+      clase.nombre
     );
+    console.log('🚀 ~ file: DecisionTree.jsx ~ line 41 ~ expansion ~ dataSetForExpansion', dataSetForExpansion);
 
-    return dataSetForExpansion.map((rama) => ({
-      valorAtributo: rama.valorAtributo,
-      nodoPuro: rama.nodoPuro,
-      nodo: gananciaMaxima.atributo,
-      ramas: expansion(rama.filas),
-    }));
+    return dataSetForExpansion.map((rama) => {
+    console.log('🚀 ~ file: DecisionTree.jsx ~ line 45 ~ returnDataSetForExpansion.map ~ rama', rama);
+    return ({
+        valorAtributo: rama.valorAtributo,
+        nodoPuro: rama.nodoPuro,
+        nodo: gananciaMaxima.atributo,
+        ramas: expansion(rama.filas),
+      })
+    });
   };
 
   const data = expansion(dataSet);
@@ -49,21 +67,24 @@ const DecisionTree = () => {
     }
 
     return datos.map((nodo) =>
-      nodo.ramas[0]?.nodo
-        ? {
-            name: nodo.ramas[0]?.nodo,
-            attributes: {
-              department: nodo.valorAtributo,
-            },
-            children: recursiveData(nodo.ramas),
-          }
-        : {
-            name: `xClase: ${nodo.nodoPuro.campoClase}`,
-            attributes: {
-              department: nodo.valorAtributo,
-            },
-            children: recursiveData(nodo.ramas),
-          }
+    {
+        console.log('🚀 ~ file: DecisionTree.jsx ~ line 70 ~ recursive2 ~ nodo', nodo);
+        return (nodo.ramas[0]?.nodo
+          ? {
+              name: nodo.ramas[0]?.nodo,
+              attributes: {
+                department: nodo.valorAtributo,
+              },
+              children: recursive2(nodo.ramas),
+            }
+          : {
+              name: nodo.nodoPuro.campoClase ? `valorClase: ${nodo.nodoPuro.campoClase}` : '?',
+              attributes: {
+                department: nodo.valorAtributo,
+              },
+              children: recursive2(nodo.ramas),
+            })
+      }
     );
   };
 
@@ -84,7 +105,7 @@ const DecisionTree = () => {
               children: recursive2(nodo.ramas),
             }
           : {
-              name: `xClase: ${nodo.nodoPuro.campoClase}`,
+              name: nodo.nodoPuro.campoClase ? `valorClase: ${nodo.nodoPuro.campoClase}` : '?',
               attributes: {
                 department: nodo.valorAtributo,
               },
