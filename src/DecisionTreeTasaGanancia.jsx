@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import dataSet from './conjuntoEntrenamiento6';
+import dataSet from './conjuntoEntrenamiento5';
 import { calcularC45 } from './funcionesTasaGanancia';
 import Tree from 'react-d3-tree';
 import { useCenteredTree } from './helpers';

@@ -1,11 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import CSVReader from 'react-csv-reader';
 import DecisionTree from './DecisionTree';
-import DecisionTreeTasaGanancia from './DecisionTreeTasaGanancia';
 import './styles.css';
 
 const App = () => {
-  const handleForce = (data, fileInfo) => console.log(data, fileInfo);
+  const [archivoCSV, setArchivoCSV] = useState([]);
+  const handleForce = (data, fileInfo) => {
+    setArchivoCSV(data);
+    console.log(data, fileInfo)
+  };
   const papaparseOptions = {
     header: true,
     dynamicTyping: true,
@@ -20,8 +23,7 @@ const App = () => {
         onFileLoaded={handleForce}
         parserOptions={papaparseOptions}
       />
-      <DecisionTreeTasaGanancia />
-      <DecisionTree />
+      {archivoCSV.length > 1 && <DecisionTree csv={archivoCSV} umbral={0} />}
     </div>
   );
 };

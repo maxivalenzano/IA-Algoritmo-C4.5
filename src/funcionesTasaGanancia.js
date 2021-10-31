@@ -150,9 +150,9 @@ export const maximoGanancia = (conjunto) => {
   return busqueda;
 };
 
-export const calculoGananciaInformacion = (entropiaTotalAtributos, entropiaConjunto) => {
-console.log('🚀 ~ file: funcionesTasaGanancia.js ~ line 154 ~ calculoGananciaInformacion ~ entropiaConjunto', entropiaConjunto);
-console.log('🚀 ~ file: funcionesTasaGanancia.js ~ line 154 ~ calculoGananciaInformacion ~ entropiaTotalAtributos', entropiaTotalAtributos);
+export const calculoTasaInformacion = (entropiaTotalAtributos, entropiaConjunto) => {
+console.log('🚀 ~ file: funcionesTasaGanancia.js ~ line 154 ~ calculoTasaInformacion ~ entropiaConjunto', entropiaConjunto);
+console.log('🚀 ~ file: funcionesTasaGanancia.js ~ line 154 ~ calculoTasaInformacion ~ entropiaTotalAtributos', entropiaTotalAtributos);
   return entropiaTotalAtributos.map((item) => {
     const atributosTotales = item.cantXclases[0].atributoTotal;
     console.log('🚀 ~ file: funcionesTasaGanancia.js ~ line 158 ~ atributos',item.atributo, ', atributosTotales:', atributosTotales);
@@ -316,7 +316,7 @@ export const expansionAlgoritmo = (dataSet) => {
   }
   const entropiaTotalAtributos = calcularEntropiaTotalXAtributo(clase.nombre, dataSet);
   console.log('🚀 ~ file: funcionesTasaGanancia.js ~ line 300 ~ expansionAlgoritmo ~ entropiaTotalAtributos', entropiaTotalAtributos);
-  const calculoGananciaInform = calculoGananciaInformacion(
+  const calculoGananciaInform = calculoTasaInformacion(
     entropiaTotalAtributos,
     entropiaConjunto
   );

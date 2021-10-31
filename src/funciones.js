@@ -1,4 +1,4 @@
-import { omit } from 'lodash-es';
+import { omit, maxBy } from 'lodash-es';
 // devuelve los titulos de la primer fila
 export const listadoTituloColumnas = (datos) => {
   return Object.keys(datos[0]);
@@ -162,6 +162,28 @@ export const calculoGananciaInformacion = (entropiaTotalAtributos, entropiaConju
   });
 };
 
+export const calculoTasaGananciaInformacion = (entropiaTotalAtributos, entropiaConjunto) => {
+  return entropiaTotalAtributos.map((item) => {
+    const atributosTotales = item.cantXclases[0].atributoTotal;
+    const cantValoresClase = atributosTotales.reduce((acc, curr) => {
+      return acc + curr.cant;
+    }, 0);
+
+    const denominadorTG = atributosTotales.reduce((acc, curr) => {
+      const termino = -1 * (curr.cant / cantValoresClase) * log2(curr.cant / cantValoresClase);
+      return acc + termino;
+    }, 0);
+    const ganancia = entropiaConjunto - item.entropia;
+
+    return {
+      atributo: item.atributo,
+      ganancia: ganancia / denominadorTG ? ganancia / denominadorTG : 0,
+      entropiasIndividuales: item.entropiasIndividuales,
+      cantXClase: item.cantXclases,
+    };
+  });
+};
+
 export const reducirTabla = (gananciaMax, atributos) => {
   let nuevoDataSet = atributos;
   const camposPuros = gananciaMax.entropiasIndividuales
@@ -180,23 +202,47 @@ export const filterConjunto = (conjunto, clase) => {
   return filtered;
 };
 
-export const filtradoSegunAtributoGananciaMaxima = (gananciaMax, dataSet, nombreClase) => {
+export const busquedaCampoClase = (gananciaMax, valor) => {
+  const busqueda = gananciaMax.cantXClase.find((campoClase) =>
+    campoClase.entropias?.find(
+      (campoAtributo) => String(campoAtributo.campoAtributo) === String(valor.campo)
+    )
+  );
+  return busqueda.entropias.find((item) => String(item.campoAtributo) === String(valor.campo));
+};
+
+export const filtradoSegunAtributoGananciaMaxima = (gananciaMax, dataSet, nombreClase, umbral) => {
   const nuevoDataSetSinPuros = reducirTabla(gananciaMax, dataSet);
   return gananciaMax.entropiasIndividuales.map((valor) => {
+    let campoPuro = {};
+    if (gananciaMax.ganancia < umbral) {
+      const valoresClasePorAtrib = gananciaMax.cantXClase.map((campoClase) => {
+        return (
+          campoClase.entropias.find((atributo) => atributo.campoAtributo === valor.campo) ?? {}
+        );
+      });
+      const maxValorClasePorAtrib = maxBy(valoresClasePorAtrib, function (item) {
+        return item.cantAtributoXClase;
+      });
+      const valoresMaxDuplicados = valoresClasePorAtrib.filter(
+        (item) => item.cantAtributoXClase === maxValorClasePorAtrib.cantAtributoXClase
+      );
+      if (valoresMaxDuplicados.length === 1) {
+        campoPuro = maxValorClasePorAtrib;
+      }
+
+      return {
+        valorAtributo: valor.campo,
+        filas: [],
+        nodoPuro: campoPuro,
+      };
+    }
     const result = nuevoDataSetSinPuros.filter((item) => {
       return String(item[gananciaMax.atributo]) === String(valor.campo);
     });
 
-    let campoPuro = {};
     if (result.length === 0) {
-      const busqueda = gananciaMax.cantXClase.find((campoClase) =>
-        campoClase.entropias?.find(
-          (campoAtributo) => String(campoAtributo.campoAtributo) === String(valor.campo)
-        )
-      );
-      campoPuro = busqueda.entropias.find(
-        (item) => String(item.campoAtributo) === String(valor.campo)
-      );
+      campoPuro = busquedaCampoClase(gananciaMax, valor);
     }
     const filtrados = result.map((fila) => omit(fila, gananciaMax.atributo));
     const entropiaFuturoConjunto = calculoEntropíaConjunto(
@@ -204,14 +250,7 @@ export const filtradoSegunAtributoGananciaMaxima = (gananciaMax, dataSet, nombre
     );
 
     if (entropiaFuturoConjunto === 0) {
-      const busqueda = gananciaMax.cantXClase.find((campoClase) =>
-        campoClase.entropias?.find(
-          (campoAtributo) => String(campoAtributo.campoAtributo) === String(valor.campo)
-        )
-      );
-      campoPuro = busqueda.entropias.find(
-        (item) => String(item.campoAtributo) === String(valor.campo)
-      );
+      campoPuro = busquedaCampoClase(gananciaMax, valor);
     }
 
     return {
@@ -279,7 +318,7 @@ export const calcularEntropiaTotalXAtributo = (nombreClase, dataSet) => {
   return entropiaTotalAtributos;
 };
 
-export const expansionAlgoritmo = (dataSet) => {
+export const expansionAlgoritmo = (dataSet, umbral) => {
   // caso base
   if (dataSet.length === 0) {
     return [];
@@ -304,7 +343,8 @@ export const expansionAlgoritmo = (dataSet) => {
   const dataSetForExpansion = filtradoSegunAtributoGananciaMaxima(
     gananciaMaxima,
     dataSet,
-    clase.nombre
+    clase.nombre,
+    umbral
   );
 
   return dataSetForExpansion.map((rama) => {
@@ -312,12 +352,51 @@ export const expansionAlgoritmo = (dataSet) => {
       valorAtributo: rama.valorAtributo,
       nodoPuro: rama.nodoPuro,
       nodo: gananciaMaxima.atributo,
-      ramas: expansionAlgoritmo(rama.filas),
+      ramas: expansionAlgoritmo(rama.filas, umbral),
     };
   });
 };
 
-export const recursive2 = (datos) => {
+export const expansionAlgoritmoConTG = (dataSet, umbral) => {
+  // caso base
+  if (dataSet.length === 0) {
+    return [];
+  }
+  const clase = posicionClase(dataSet);
+  // caso base, si nodo Impuro
+  if (clase.index === 0) {
+    return [];
+  }
+  const listadoValoresClases = listadoValoresColumna(dataSet, clase.nombre);
+  const entropiaConjunto = calculoEntropíaConjunto(listadoValoresClases);
+  // caso base, si nodo es puro
+  if (entropiaConjunto === 0) {
+    return [];
+  }
+  const entropiaTotalAtributos = calcularEntropiaTotalXAtributo(clase.nombre, dataSet);
+  const calculoGananciaInform = calculoTasaGananciaInformacion(
+    entropiaTotalAtributos,
+    entropiaConjunto
+  );
+  const gananciaMaxima = maximoGanancia(calculoGananciaInform);
+  const dataSetForExpansion = filtradoSegunAtributoGananciaMaxima(
+    gananciaMaxima,
+    dataSet,
+    clase.nombre,
+    umbral
+  );
+
+  return dataSetForExpansion.map((rama) => {
+    return {
+      valorAtributo: rama.valorAtributo,
+      nodoPuro: rama.nodoPuro,
+      nodo: gananciaMaxima.atributo,
+      ramas: expansionAlgoritmo(rama.filas, umbral),
+    };
+  });
+};
+
+export const auxFormateoDatos = (datos) => {
   if (datos.length === 0) {
     return [];
   }
@@ -339,12 +418,12 @@ export const recursive2 = (datos) => {
           attributes: {
             department: nodo.valorAtributo,
           },
-          children: recursive2(nodo.ramas),
+          children: auxFormateoDatos(nodo.ramas),
         };
   });
 };
 
-export const recursiveData = (datos) => {
+export const formatearDatos = (datos) => {
   if (datos.length === 0) {
     return [];
   }
@@ -368,13 +447,18 @@ export const recursiveData = (datos) => {
             attributes: {
               department: nodo.valorAtributo,
             },
-            children: recursive2(nodo.ramas),
+            children: auxFormateoDatos(nodo.ramas),
           };
     }),
   };
 };
 
-export const calcularC45 = (dataSet) => {
-  const data = expansionAlgoritmo(dataSet);
-  return recursiveData(data);
+export const calcularC45 = (dataSet, umbral) => {
+  const data = expansionAlgoritmo(dataSet, umbral);
+  return formatearDatos(data);
+};
+
+export const calcularC45_TG = (dataSet, umbral) => {
+  const data = expansionAlgoritmoConTG(dataSet, umbral);
+  return formatearDatos(data);
 };
