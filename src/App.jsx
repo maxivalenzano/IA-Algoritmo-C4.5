@@ -1,51 +1,91 @@
-import React from 'react';
+import React, { useState } from 'react';
 import CSVReader from 'react-csv-reader';
 import BotonCargar from './boton';
 import DecisionTree from './DecisionTree';
+import DecisionTreeTG from './DecisionTreeTG';
+import { Container, Button } from 'react-bootstrap';
 import './styles.css';
-import {Link} from 'react-router-dom';
-
 
 //Crea el footer de la página principal
 const Footer = () => (
-    <footer className="footer">
-        <p>Inteligencia Artificial - Grupo 10</p>
-    </footer>
+  <footer className="footer">
+    <p>Inteligencia Artificial - Grupo 10</p>
+  </footer>
 );
 
-
 const App = () => {
-  const handleForce = (data, fileInfo) => console.log(data, fileInfo);
+  const [archivoCSV, setArchivoCSV] = useState(null);
+  const [umbral, setUmbral] = useState(0);
+  const [page1, setPage1] = useState(true);
+
+  const handleForce = (data, fileInfo) => {
+    setArchivoCSV(data);
+    console.log(data, fileInfo);
+  };
   const papaparseOptions = {
     header: true,
     dynamicTyping: true,
     skipEmptyLines: true,
     transformHeader: (header) => header.toLowerCase().replace(/\W/g, '_'),
   };
-    return (
+  return (
+    <>
+      {page1 ? (
         <div className="container">
-            <div>
-                <p className='f1'>
-                    {'Análisis Comparativo - Árboles de decisión'}
-                </p>
+          <p className="f1">Análisis Comparativo - Árboles de decisión</p>
+          <div className="container2">
+            <div class="form-group">
+              <CSVReader
+                cssClass="react-csv-input"
+                label="Seleccione un archivo CSV"
+                onFileLoaded={handleForce}
+                parserOptions={papaparseOptions}
+              />
             </div>
-            <div className="container2">
-            
-            <form>
-               <div class="form-group">
-                <label for="exampleFormControlFile1">Ingrese un archivo CSV:</label>
-                <input type="file" accept=".txt, .csv" class="form-control-file" id="exampleFormControlFile1" onclick="" required/>
-              </div>
-                <DecisionTree />
-            
-              <div className="container3">
-               <BotonCargar />
-              </div>
-            </form>
+            <div type="number" className="form-control-plaintext hola">
+              <p>Ingrese Umbral: </p>
+              <input
+                required
+                cssClass="box"
+                value={umbral}
+                onChange={(e) => setUmbral(e.target.value)}
+                type="number"
+                id="inputUmbral"
+                min={0}
+                max={1}
+                step={0.001}
+              />
             </div>
-           <Footer />
+            <div className="container3">
+              <BotonCargar archivoCSV={archivoCSV} umbral={umbral} setPage1={setPage1} />
+            </div>
+          </div>
+          <Footer />
         </div>
-    );
+      ) : (
+        <>
+          <Container className="botones-page1">
+            <Button className="boton-page1" size="lg" onClick={() => setPage1(true)}>
+              Regresar al menú principal
+            </Button>
+            <Button className="boton-page1" size="lg">
+              Mostrar paso siguiente
+            </Button>
+            <Button className="boton-page1" size="lg">
+              Mostrar árboles completos
+            </Button>
+            <Button className="boton-page1" type="reset" size="lg">
+              Resetear gráficos
+            </Button>
+          </Container>
+          <p>Con ganancia de Información:</p>
+          <DecisionTree csv={archivoCSV} umbral={umbral} />
+          <p>Con Tasa de ganancia:</p>
+          <DecisionTreeTG csv={archivoCSV} umbral={umbral} />
+        </>
+      )}
+    </>
+  );
 };
- 
+
 export default App;

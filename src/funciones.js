@@ -1,4 +1,4 @@
-import { omit } from 'lodash-es';
+import { omit, maxBy } from 'lodash-es';
 // devuelve los titulos de la primer fila
 export const listadoTituloColumnas = (datos) => {
   return Object.keys(datos[0]);
@@ -23,9 +23,13 @@ export const listadoValoresColumna = (datos, nombreColumna) => {
   return datos.map((item) => item[nombreColumna]);
 };
 
-// devuevle log en base 2
+// devuelve log en base 2
 export const log2 = (n) => {
   return Math.log(n) / Math.log(2);
+};
+
+export const logN = (n, m) => {
+  return Math.log(n) / Math.log(m);
 };
 
 // devuelve un objeto con cada nombre de atributo y su cantidad de aparicion
@@ -44,23 +48,27 @@ export const cantidadApariciones = (arr) => {
 };
 
 // devuelve la entropia del conjunto
-export const calculoEntropíaConjunto = (columna) => {
-  const columnaClase = cantidadApariciones(columna);
-  const cantAtrib = columna.length;
+export const calculoEntropíaConjunto = (columnaDeLaClase) => {
+  const cantidadPorValorDeClase = cantidadApariciones(columnaDeLaClase);
+  const cantElementosD = columnaDeLaClase.length;
   let entropia = 0;
-  columnaClase.forEach((item) => {
-    entropia = entropia + -1 * (item.cant / cantAtrib) * log2(item.cant / cantAtrib);
+  cantidadPorValorDeClase.forEach((campoValorClase) => {
+    const terminoValorClase =
+      -1 * (campoValorClase.cant / cantElementosD) * log2(campoValorClase.cant / cantElementosD);
+    entropia = entropia + terminoValorClase;
   });
   return entropia;
 };
 
-export const listadoDeAtributosSeparadosPorColumna = (nombreColumna, dataSet) => {
+export const listadoDeAtributosSeparadosPorColumna = (nombreClase, dataSet) => {
   const columnas = listadoTituloColumnas(dataSet);
-  const listaAtributos = columnas.filter((item) => item !== nombreColumna);
-  const cantidadAtributoClases = cantidadApariciones(listadoValoresColumna(dataSet, nombreColumna));
+  const listaAtributos = columnas.filter((item) => item !== nombreClase);
+  const cantidadValoresDeClase = cantidadApariciones(listadoValoresColumna(dataSet, nombreClase));
   return listaAtributos.map((atributo) => {
-    const filtradoSegunClase = cantidadAtributoClases.map((clase) => {
-      const listadoCamposClase = dataSet.filter((item) => item[nombreColumna] === clase.campo);
+    const filtradoSegunClase = cantidadValoresDeClase.map((clase) => {
+      const listadoCamposClase = dataSet.filter((item) => {
+        return String(item[nombreClase]) === String(clase.campo);
+      });
       const listadoAtributosSeparadoPorClase = listadoCamposClase.map((item) => {
         return item[atributo];
       });
@@ -98,14 +106,19 @@ export const sumaEntropía = (calculosPorClase) => {
 
 export const calculoEntropíaIndividual = (atributo, cantValorPorAtributo) => {
   return atributo.filtradoSegunClase.map((clase) => {
-    const atributoTotal = cantValorPorAtributo.find((item) => item.atributo === atributo.atributo);
+    const atributoTotal = cantValorPorAtributo.find(
+      (item) => String(item.atributo) === String(atributo.atributo)
+    );
+
     const result = clase.atributos.map((key) => {
-      const cantValorAtributo = atributoTotal.cant.find((value) => value.campo === key.campo);
+      const cantValorAtributo = atributoTotal.cant.find(
+        (value) => String(value.campo) === String(key.campo)
+      );
       const campoAtributo = key.campo;
-      const entropiaParcial =
-        -1 * ((key.cant / cantValorAtributo.cant) * log2(key.cant / cantValorAtributo.cant));
+      const terminoEntropiaParcial =
+        -1 * (key.cant / cantValorAtributo.cant) * log2(key.cant / cantValorAtributo.cant);
       return {
-        entropiaParcial: entropiaParcial,
+        entropiaParcial: terminoEntropiaParcial,
         campoAtributo: campoAtributo,
         campoClase: clase.campoClase,
         cantTotalXatributo: cantValorAtributo.cant,
@@ -149,6 +162,28 @@ export const calculoGananciaInformacion = (entropiaTotalAtributos, entropiaConju
   });
 };
 
+export const calculoTasaGananciaInformacion = (entropiaTotalAtributos, entropiaConjunto) => {
+  return entropiaTotalAtributos.map((item) => {
+    const atributosTotales = item.cantXclases[0].atributoTotal;
+    const cantValoresClase = atributosTotales.reduce((acc, curr) => {
+      return acc + curr.cant;
+    }, 0);
+
+    const denominadorTG = atributosTotales.reduce((acc, curr) => {
+      const termino = -1 * (curr.cant / cantValoresClase) * log2(curr.cant / cantValoresClase);
+      return acc + termino;
+    }, 0);
+    const ganancia = entropiaConjunto - item.entropia;
+
+    return {
+      atributo: item.atributo,
+      ganancia: ganancia / denominadorTG ? ganancia / denominadorTG : 0,
+      entropiasIndividuales: item.entropiasIndividuales,
+      cantXClase: item.cantXclases,
+    };
+  });
+};
+
 export const reducirTabla = (gananciaMax, atributos) => {
   let nuevoDataSet = atributos;
   const camposPuros = gananciaMax.entropiasIndividuales
@@ -167,22 +202,62 @@ export const filterConjunto = (conjunto, clase) => {
   return filtered;
 };
 
-export const filtradoSegunAtributoGananciaMaxima = (gananciaMax, dataSet) => {
+export const busquedaCampoClase = (gananciaMax, valor) => {
+  const busqueda = gananciaMax.cantXClase.find((campoClase) =>
+    campoClase.entropias?.find(
+      (campoAtributo) => String(campoAtributo.campoAtributo) === String(valor.campo)
+    )
+  );
+  return busqueda.entropias.find((item) => String(item.campoAtributo) === String(valor.campo));
+};
+
+export const filtradoSegunAtributoGananciaMaxima = (gananciaMax, dataSet, nombreClase, umbral) => {
   const nuevoDataSetSinPuros = reducirTabla(gananciaMax, dataSet);
   return gananciaMax.entropiasIndividuales.map((valor) => {
-    const result = nuevoDataSetSinPuros.filter(
-      (item) => item[gananciaMax.atributo] === valor.campo
-    );
-
     let campoPuro = {};
-    if (result.length === 0) {
-      const busqueda = gananciaMax.cantXClase.find((campoClase) =>
-        campoClase.entropias?.find((campoAtributo) => campoAtributo.campoAtributo === valor.campo)
+    if (gananciaMax.ganancia < umbral) {
+      const valoresClasePorAtrib = gananciaMax.cantXClase.map((campoClase) => {
+        return (
+          campoClase.entropias.find((atributo) => atributo.campoAtributo === valor.campo) ?? {}
+        );
+      });
+      const maxValorClasePorAtrib = maxBy(valoresClasePorAtrib, function (item) {
+        return item.cantAtributoXClase;
+      });
+      const valoresMaxDuplicados = valoresClasePorAtrib.filter(
+        (item) => item.cantAtributoXClase === maxValorClasePorAtrib.cantAtributoXClase
       );
-      campoPuro = busqueda.entropias.find((item) => item.campoAtributo === valor.campo);
+      if (valoresMaxDuplicados.length === 1) {
+        campoPuro = maxValorClasePorAtrib;
+      }
+
+      return {
+        valorAtributo: valor.campo,
+        filas: [],
+        nodoPuro: campoPuro,
+      };
+    }
+    const result = nuevoDataSetSinPuros.filter((item) => {
+      return String(item[gananciaMax.atributo]) === String(valor.campo);
+    });
+
+    if (result.length === 0) {
+      campoPuro = busquedaCampoClase(gananciaMax, valor);
     }
     const filtrados = result.map((fila) => omit(fila, gananciaMax.atributo));
-    return { valorAtributo: valor.campo, filas: filtrados, nodoPuro: campoPuro };
+    const entropiaFuturoConjunto = calculoEntropíaConjunto(
+      listadoValoresColumna(filtrados, nombreClase)
+    );
+
+    if (entropiaFuturoConjunto === 0) {
+      campoPuro = busquedaCampoClase(gananciaMax, valor);
+    }
+
+    return {
+      valorAtributo: valor.campo,
+      filas: filtrados,
+      nodoPuro: campoPuro,
+    };
   });
 };
 
@@ -219,7 +294,9 @@ export const calcularEntropiaTotalXAtributo = (nombreClase, dataSet) => {
 
   const entropiaTotalAtributos = calculosEntropíaIndividual.map((item) => {
     const result = item.entropiasTotales.map((value) => {
-      const cantValorAtributo = item.cantAtributos.find((key) => key.campo === value.campo);
+      const cantValorAtributo = item.cantAtributos.find(
+        (key) => String(key.campo) === String(value.campo)
+      );
       const entropy = (cantValorAtributo.cant / listadoValoresClases.length) * value.entropia;
       return {
         campo: value.campo,
@@ -239,4 +316,149 @@ export const calcularEntropiaTotalXAtributo = (nombreClase, dataSet) => {
     };
   });
   return entropiaTotalAtributos;
+};
+
+export const expansionAlgoritmo = (dataSet, umbral) => {
+  // caso base
+  if (dataSet.length === 0) {
+    return [];
+  }
+  const clase = posicionClase(dataSet);
+  // caso base, si nodo Impuro
+  if (clase.index === 0) {
+    return [];
+  }
+  const listadoValoresClases = listadoValoresColumna(dataSet, clase.nombre);
+  const entropiaConjunto = calculoEntropíaConjunto(listadoValoresClases);
+  // caso base, si nodo es puro
+  if (entropiaConjunto === 0) {
+    return [];
+  }
+  const entropiaTotalAtributos = calcularEntropiaTotalXAtributo(clase.nombre, dataSet);
+  const calculoGananciaInform = calculoGananciaInformacion(
+    entropiaTotalAtributos,
+    entropiaConjunto
+  );
+  const gananciaMaxima = maximoGanancia(calculoGananciaInform);
+  const dataSetForExpansion = filtradoSegunAtributoGananciaMaxima(
+    gananciaMaxima,
+    dataSet,
+    clase.nombre,
+    umbral
+  );
+
+  return dataSetForExpansion.map((rama) => {
+    return {
+      valorAtributo: rama.valorAtributo,
+      nodoPuro: rama.nodoPuro,
+      nodo: gananciaMaxima.atributo,
+      ramas: expansionAlgoritmo(rama.filas, umbral),
+    };
+  });
+};
+
+export const expansionAlgoritmoConTG = (dataSet, umbral) => {
+  // caso base
+  if (dataSet.length === 0) {
+    return [];
+  }
+  const clase = posicionClase(dataSet);
+  // caso base, si nodo Impuro
+  if (clase.index === 0) {
+    return [];
+  }
+  const listadoValoresClases = listadoValoresColumna(dataSet, clase.nombre);
+  const entropiaConjunto = calculoEntropíaConjunto(listadoValoresClases);
+  // caso base, si nodo es puro
+  if (entropiaConjunto === 0) {
+    return [];
+  }
+  const entropiaTotalAtributos = calcularEntropiaTotalXAtributo(clase.nombre, dataSet);
+  const calculoGananciaInform = calculoTasaGananciaInformacion(
+    entropiaTotalAtributos,
+    entropiaConjunto
+  );
+  const gananciaMaxima = maximoGanancia(calculoGananciaInform);
+  const dataSetForExpansion = filtradoSegunAtributoGananciaMaxima(
+    gananciaMaxima,
+    dataSet,
+    clase.nombre,
+    umbral
+  );
+
+  return dataSetForExpansion.map((rama) => {
+    return {
+      valorAtributo: rama.valorAtributo,
+      nodoPuro: rama.nodoPuro,
+      nodo: gananciaMaxima.atributo,
+      ramas: expansionAlgoritmo(rama.filas, umbral),
+    };
+  });
+};
+
+export const auxFormateoDatos = (datos) => {
+  if (datos.length === 0) {
+    return [];
+  }
+  return datos.map((nodo) => {
+    const nameNodo = nodo.ramas[0]?.nodo
+      ? `Nodo: ${nodo.ramas[0]?.nodo}`
+      : nodo.nodoPuro.campoClase
+      ? `valorClase: ${nodo.nodoPuro.campoClase}`
+      : 'NodoImpuro';
+    return nodo.ramas.length === 0
+      ? {
+          name: nameNodo,
+          attributes: {
+            department: nodo.valorAtributo,
+          },
+        }
+      : {
+          name: nameNodo,
+          attributes: {
+            department: nodo.valorAtributo,
+          },
+          children: auxFormateoDatos(nodo.ramas),
+        };
+  });
+};
+
+export const formatearDatos = (datos) => {
+  if (datos.length === 0) {
+    return [];
+  }
+  return {
+    name: datos[0].nodo,
+    children: datos.map((nodo) => {
+      const nameNodo = nodo.ramas[0]?.nodo
+        ? `Nodo: ${nodo.ramas[0]?.nodo}`
+        : nodo.nodoPuro.campoClase
+        ? `valorClase: ${nodo.nodoPuro.campoClase}`
+        : 'NodoImpuro';
+      return nodo.ramas.length === 0
+        ? {
+            name: nameNodo,
+            attributes: {
+              department: nodo.valorAtributo,
+            },
+          }
+        : {
+            name: nameNodo,
+            attributes: {
+              department: nodo.valorAtributo,
+            },
+            children: auxFormateoDatos(nodo.ramas),
+          };
+    }),
+  };
+};
+
+export const calcularC45 = (dataSet, umbral) => {
+  const data = expansionAlgoritmo(dataSet, umbral);
+  return formatearDatos(data);
+};
+
+export const calcularC45_TG = (dataSet, umbral) => {
+  const data = expansionAlgoritmoConTG(dataSet, umbral);
+  return formatearDatos(data);
 };
