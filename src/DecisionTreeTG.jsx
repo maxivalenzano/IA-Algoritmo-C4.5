@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 // import dataSet from './conjuntoEntrenamiento2';
-import { calcularC45 } from './funciones';
+import { calcularC45_TG } from './funciones';
 import Tree from 'react-d3-tree';
 import { useCenteredTree, renderRectSvgNode } from './useCenteredTree';
 import swal from 'sweetalert';
@@ -14,9 +14,9 @@ const containerStyles = {
 const DecisionTree = ({ csv, umbral = 0 }) => {
   console.log('🚀 ~ file: DecisionTree.jsx ~ line 39 ~ DecisionTree ~ csv', csv);
   const [translate, containerRef] = useCenteredTree();
-  const [jsonValuesC45, setJsonValuesC45] = useState({});
+  const [jsonValuesC45TG, setJsonValuesC45TG] = useState({});
   useEffect(() => {
-    setJsonValuesC45(calcularC45(csv, umbral));
+    setJsonValuesC45TG(calcularC45_TG(csv, umbral));
   }, [csv, umbral]);
 
   const handleNodeClick = (nodeDatum) => {
@@ -28,7 +28,7 @@ const DecisionTree = ({ csv, umbral = 0 }) => {
     <React.Fragment>
       <div style={containerStyles} ref={containerRef}>
         <Tree
-          data={jsonValuesC45}
+          data={jsonValuesC45TG}
           translate={translate}
           renderCustomNodeElement={(rd3tProps) =>
             renderRectSvgNode({ ...rd3tProps, handleNodeClick })
