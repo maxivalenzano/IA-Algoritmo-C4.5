@@ -17,6 +17,8 @@ const App = () => {
   const [archivoCSV, setArchivoCSV] = useState(null);
   const [umbral, setUmbral] = useState(0);
   const [page1, setPage1] = useState(true);
+  const [viewTree1, setViewTree1] = useState(true);
+  const [viewTree2, setViewTree2] = useState(false);
 
   const handleForce = (data, fileInfo) => {
     setArchivoCSV(data);
@@ -68,20 +70,35 @@ const App = () => {
             <Button className="boton-page1" size="lg" onClick={() => setPage1(true)}>
               Regresar al menú principal
             </Button>
-            <Button className="boton-page1" size="lg">
-              Mostrar paso siguiente
+            <Button className="boton-page1" size="lg" onClick={() => setViewTree1(!viewTree1)}>
+              {viewTree1 ? 'Ocultar árbol con Ganancia' : 'Mostrar arbol con Ganancia'}
             </Button>
-            <Button className="boton-page1" size="lg">
-              Mostrar árboles completos
+            <Button className="boton-page1" size="lg" onClick={() => setViewTree2(!viewTree2)}>
+              {viewTree2 ? 'Ocultar árbol Tasa Ganancia' : 'Mostrar arbol Tasa Ganancia'}
             </Button>
-            <Button className="boton-page1" type="reset" size="lg">
+            <Button
+              className="boton-page1"
+              size="lg"
+              onClick={() => {
+                setPage1(true);
+                setArchivoCSV(null);
+                setUmbral(0);
+              }}>
               Resetear gráficos
             </Button>
           </Container>
-          <p>Con ganancia de Información:</p>
-          <DecisionTree csv={archivoCSV} umbral={umbral} />
-          <p>Con Tasa de ganancia:</p>
-          <DecisionTreeTG csv={archivoCSV} umbral={umbral} />
+            {viewTree1 && (
+              <>
+                <p>Con ganancia de Información:</p>
+                <DecisionTree csv={archivoCSV} umbral={umbral} />
+              </>
+            )}
+            {viewTree2 && (
+              <>
+                <p>Con Tasa de ganancia:</p>
+                <DecisionTreeTG csv={archivoCSV} umbral={umbral} />
+              </>
+            )}
         </>
       )}
     </>

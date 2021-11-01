@@ -14,7 +14,7 @@ const renderRectSvgNode = ({ nodeDatum, toggleNode, handleNodeClick }) => (
   <g>
     <circle r="15" x="-10" onClick={toggleNode} />
     {nodeDatum.name === 'NodoImpuro' ? (
-      <text fill="red" strokeWidth="1" x="20" onClick={() => handleNodeClick(nodeDatum)}>
+      <text fill="red" stroke='red' strokeWidth="1" x="20" onClick={() => handleNodeClick(nodeDatum)}>
         {nodeDatum.name}
       </text>
     ) : (
