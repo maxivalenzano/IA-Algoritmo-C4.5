@@ -6,12 +6,12 @@ import { useCenteredTree, renderRectSvgNode } from './useCenteredTree';
 import swal from 'sweetalert';
 import './styles.css';
 
-const containerStyles = {
-  width: '100vw',
-  height: '100vh',
-};
 
-const DecisionTree = ({ csv, umbral = 0 }) => {
+const DecisionTree = ({ csv, umbral = 0, width, height }) => {
+  const containerStyles = {
+    width: width,
+    height: height,
+  };
   console.log('🚀 ~ file: DecisionTree.jsx ~ line 39 ~ DecisionTree ~ csv', csv);
   const [translate, containerRef] = useCenteredTree();
   const [jsonValuesC45TG, setJsonValuesC45TG] = useState({});

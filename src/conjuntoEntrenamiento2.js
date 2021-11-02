@@ -1,6 +1,5 @@
 const conjuntoEntrenamiento2 = [
   {
-    "id": 1,
     "hipertenso": "no",
     "colesterol": "bajo",
     "trigliceridos": "normal",
@@ -9,7 +8,6 @@ const conjuntoEntrenamiento2 = [
     "p_cardiaco": "no"
 },
 {
-    "id": 2,
     "hipertenso": "si",
     "colesterol": "bajo",
     "trigliceridos": "elevado",
@@ -18,7 +16,6 @@ const conjuntoEntrenamiento2 = [
     "p_cardiaco": "no"
 },
 {
-    "id": 3,
     "hipertenso": "si",
     "colesterol": "bajo",
     "trigliceridos": "elevado",
@@ -27,7 +24,6 @@ const conjuntoEntrenamiento2 = [
     "p_cardiaco": "si"
 },
 {
-    "id": 4,
     "hipertenso": "si",
     "colesterol": "medio",
     "trigliceridos": "elevado",
@@ -36,7 +32,6 @@ const conjuntoEntrenamiento2 = [
     "p_cardiaco": "si"
 },
 {
-    "id": 5,
     "hipertenso": "no",
     "colesterol": "medio",
     "trigliceridos": "elevado",
@@ -45,7 +40,6 @@ const conjuntoEntrenamiento2 = [
     "p_cardiaco": "si"
 },
 {
-    "id": 6,
     "hipertenso": "no",
     "colesterol": "medio",
     "trigliceridos": "normal",
@@ -54,7 +48,6 @@ const conjuntoEntrenamiento2 = [
     "p_cardiaco": "no"
 },
 {
-    "id": 7,
     "hipertenso": "si",
     "colesterol": "alto",
     "trigliceridos": "normal",
@@ -63,7 +56,6 @@ const conjuntoEntrenamiento2 = [
     "p_cardiaco": "si"
 },
 {
-    "id": 8,
     "hipertenso": "si",
     "colesterol": "alto",
     "trigliceridos": "normal",
@@ -72,7 +64,6 @@ const conjuntoEntrenamiento2 = [
     "p_cardiaco": "si"
 },
 {
-    "id": 9,
     "hipertenso": "si",
     "colesterol": "alto",
     "trigliceridos": "elevado",
@@ -81,7 +72,6 @@ const conjuntoEntrenamiento2 = [
     "p_cardiaco": "si"
 },
 {
-    "id": 10,
     "hipertenso": "no",
     "colesterol": "alto",
     "trigliceridos": "normal",

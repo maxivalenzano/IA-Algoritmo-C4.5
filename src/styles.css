@@ -14,21 +14,27 @@
 }
 
 .container3 {
-  vertical-align: none !important;
   padding-top: 50px;
 }
 
-.csv-input {
+/* .csv-input {
   padding: 10px;
   display: inline;
   margin: 15px 15px;
-  border: 1px solid #ccc;
+  border: 0px solid #ccc;
   border-radius: 5px;
   width: 350px;
   height: 40px;
   text-align: center;
   padding-top: 50px;
   padding-bottom: 30px;
+} */
+.csv-input {
+  padding: 10px;
+  display: block;
+  margin: 15px auto;
+  /* border: 1px solid #ccc; */
+  border-radius: 5px;
 }
 
 .p {
@@ -62,7 +68,6 @@
 .hola {
   display: inline;
   text-align: center;
-  /*padding-left: 480px;*/
   font-size: 25px;
   padding-top: 120px;
 }
@@ -92,9 +97,6 @@
   left: 0px;
 }
 
-.botones-page2 {
-  display: flex;
-}
 
 .boton-page2 {
   width: 373px;

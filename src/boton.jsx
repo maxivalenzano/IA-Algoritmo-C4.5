@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container, Button } from 'react-bootstrap';
+import { Box, Button } from '@material-ui/core';
 import swal from 'sweetalert';
 import './styles.css';
 
@@ -12,22 +12,22 @@ function BotonCargar({ umbral, archivoCSV, setPage1 }) {
       swal({
         text: 'Debes subir un archivo CSV',
       });
-      return null
+      return null;
     }
     if (!(umbral < 1 && umbral >= 0)) {
       swal({
         text: 'Debes ingresar un umbral entre 0 y 1',
       });
-      return null
+      return null;
     }
-    setPage1(false)
+    setPage1(false);
   }
   return (
-    <Container style={{ paddingTop: '2rem', paddingLeft: '35rem' }}>
-      <Button onClick={nextPage} size="lg">
+    <Box align="center">
+      <Button onClick={nextPage} style={{ backgroundColor: '#C0D4F0' }}  size="large">
         Cargar datos
       </Button>
-    </Container>
+    </Box>
   );
 }
 
