@@ -4,17 +4,9 @@ import dataSet from './conjuntoEntrenamiento2';
 import BotonCargar from './boton';
 import DecisionTree from './DecisionTree';
 import DecisionTreeTG from './DecisionTreeTG';
-import { Box, Container, Button, Typography, makeStyles, Grid } from '@material-ui/core';
+import { Box, Container, Button, Typography, Grid } from '@material-ui/core';
 import './styles.css';
 
-const useStyles = makeStyles((theme) => ({
-  input: {
-    padding: '10px',
-    display: 'block',
-    margin: '15px auto',
-    borderRadius: '5px',
-  },
-}));
 
 //Crea el footer de la página principal
 const Footer = () => (
@@ -24,7 +16,6 @@ const Footer = () => (
 );
 
 const App = () => {
-  // const classes = useStyles();
   const [archivoCSV, setArchivoCSV] = useState(dataSet);
   const [umbral, setUmbral] = useState(0);
   const [page1, setPage1] = useState(true);
