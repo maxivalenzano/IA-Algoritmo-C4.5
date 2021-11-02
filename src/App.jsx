@@ -24,7 +24,7 @@ const Footer = () => (
 );
 
 const App = () => {
-  const classes = useStyles();
+  // const classes = useStyles();
   const [archivoCSV, setArchivoCSV] = useState(dataSet);
   const [umbral, setUmbral] = useState(0);
   const [page1, setPage1] = useState(true);

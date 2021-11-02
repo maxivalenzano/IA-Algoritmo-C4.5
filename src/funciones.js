@@ -48,13 +48,15 @@ export const cantidadApariciones = (arr) => {
 };
 
 // devuelve la entropia del conjunto
-export const calculoEntropíaConjunto = (columnaDeLaClase) => {
+export const calculoEntropíaConjunto = (columnaDeLaClase, baseLogN) => {
   const cantidadPorValorDeClase = cantidadApariciones(columnaDeLaClase);
   const cantElementosD = columnaDeLaClase.length;
   let entropia = 0;
   cantidadPorValorDeClase.forEach((campoValorClase) => {
     const terminoValorClase =
-      -1 * (campoValorClase.cant / cantElementosD) * log2(campoValorClase.cant / cantElementosD);
+      -1 *
+      (campoValorClase.cant / cantElementosD) *
+      logN(campoValorClase.cant / cantElementosD, baseLogN);
     entropia = entropia + terminoValorClase;
   });
   return entropia;
@@ -104,7 +106,7 @@ export const sumaEntropía = (calculosPorClase) => {
   return entropyToObject;
 };
 
-export const calculoEntropíaIndividual = (atributo, cantValorPorAtributo) => {
+export const calculoEntropíaIndividual = (atributo, cantValorPorAtributo, baseLogN) => {
   return atributo.filtradoSegunClase.map((clase) => {
     const atributoTotal = cantValorPorAtributo.find(
       (item) => String(item.atributo) === String(atributo.atributo)
@@ -116,7 +118,9 @@ export const calculoEntropíaIndividual = (atributo, cantValorPorAtributo) => {
       );
       const campoAtributo = key.campo;
       const terminoEntropiaParcial =
-        -1 * (key.cant / cantValorAtributo.cant) * log2(key.cant / cantValorAtributo.cant);
+        -1 *
+        (key.cant / cantValorAtributo.cant) *
+        logN(key.cant / cantValorAtributo.cant, baseLogN);
       return {
         entropiaParcial: terminoEntropiaParcial,
         campoAtributo: campoAtributo,
@@ -162,7 +166,11 @@ export const calculoGananciaInformacion = (entropiaTotalAtributos, entropiaConju
   });
 };
 
-export const calculoTasaGananciaInformacion = (entropiaTotalAtributos, entropiaConjunto) => {
+export const calculoTasaGananciaInformacion = (
+  entropiaTotalAtributos,
+  entropiaConjunto,
+  baseLogN
+) => {
   return entropiaTotalAtributos.map((item) => {
     const atributosTotales = item.cantXclases[0].atributoTotal;
     const cantValoresClase = atributosTotales.reduce((acc, curr) => {
@@ -170,7 +178,8 @@ export const calculoTasaGananciaInformacion = (entropiaTotalAtributos, entropiaC
     }, 0);
 
     const denominadorTG = atributosTotales.reduce((acc, curr) => {
-      const termino = -1 * (curr.cant / cantValoresClase) * log2(curr.cant / cantValoresClase);
+      const termino =
+        -1 * (curr.cant / cantValoresClase) * logN(curr.cant / cantValoresClase, baseLogN);
       return acc + termino;
     }, 0);
     const ganancia = entropiaConjunto - item.entropia;
@@ -211,7 +220,13 @@ export const busquedaCampoClase = (gananciaMax, valor) => {
   return busqueda.entropias.find((item) => String(item.campoAtributo) === String(valor.campo));
 };
 
-export const filtradoSegunAtributoGananciaMaxima = (gananciaMax, dataSet, nombreClase, umbral) => {
+export const filtradoSegunAtributoGananciaMaxima = (
+  gananciaMax,
+  dataSet,
+  nombreClase,
+  umbral,
+  baseLogN
+) => {
   const nuevoDataSetSinPuros = reducirTabla(gananciaMax, dataSet);
   return gananciaMax.entropiasIndividuales.map((valor) => {
     let campoPuro = {};
@@ -246,7 +261,8 @@ export const filtradoSegunAtributoGananciaMaxima = (gananciaMax, dataSet, nombre
     }
     const filtrados = result.map((fila) => omit(fila, gananciaMax.atributo));
     const entropiaFuturoConjunto = calculoEntropíaConjunto(
-      listadoValoresColumna(filtrados, nombreClase)
+      listadoValoresColumna(filtrados, nombreClase),
+      baseLogN
     );
 
     if (entropiaFuturoConjunto === 0) {
@@ -261,7 +277,7 @@ export const filtradoSegunAtributoGananciaMaxima = (gananciaMax, dataSet, nombre
   });
 };
 
-export const calculoEntropiaIndividual = (claseNombre, dataSet) => {
+export const calculoEntropiaIndividual = (claseNombre, dataSet, baseLogN) => {
   const columnas = listadoTituloColumnas(dataSet);
   const listaAtributos = columnas.filter((item) => item !== claseNombre);
 
@@ -275,7 +291,11 @@ export const calculoEntropiaIndividual = (claseNombre, dataSet) => {
 
   const calculosEntropíaIndividual = listadoAtributosSeparadosPorClase.map((atributo) => {
     // buscar valores aquí de la cantidad por atributos
-    const calculosPorClase = calculoEntropíaIndividual(atributo, cantValorPorAtributoConst);
+    const calculosPorClase = calculoEntropíaIndividual(
+      atributo,
+      cantValorPorAtributoConst,
+      baseLogN
+    );
     const entropiaTotal = sumaEntropía(calculosPorClase);
     return {
       atributo: atributo.atributo,
@@ -287,10 +307,10 @@ export const calculoEntropiaIndividual = (claseNombre, dataSet) => {
   return calculosEntropíaIndividual;
 };
 
-export const calcularEntropiaTotalXAtributo = (nombreClase, dataSet) => {
+export const calcularEntropiaTotalXAtributo = (nombreClase, dataSet, baseLogN) => {
   const listadoValoresClases = listadoValoresColumna(dataSet, nombreClase);
 
-  const calculosEntropíaIndividual = calculoEntropiaIndividual(nombreClase, dataSet);
+  const calculosEntropíaIndividual = calculoEntropiaIndividual(nombreClase, dataSet, baseLogN);
 
   const entropiaTotalAtributos = calculosEntropíaIndividual.map((item) => {
     const result = item.entropiasTotales.map((value) => {
@@ -318,7 +338,7 @@ export const calcularEntropiaTotalXAtributo = (nombreClase, dataSet) => {
   return entropiaTotalAtributos;
 };
 
-export const expansionAlgoritmo = (dataSet, umbral) => {
+export const expansionAlgoritmo = (dataSet, umbral, baseLogN) => {
   // caso base
   if (dataSet.length === 0) {
     return [];
@@ -329,12 +349,12 @@ export const expansionAlgoritmo = (dataSet, umbral) => {
     return [];
   }
   const listadoValoresClases = listadoValoresColumna(dataSet, clase.nombre);
-  const entropiaConjunto = calculoEntropíaConjunto(listadoValoresClases);
+  const entropiaConjunto = calculoEntropíaConjunto(listadoValoresClases, baseLogN);
   // caso base, si nodo es puro
   if (entropiaConjunto === 0) {
     return [];
   }
-  const entropiaTotalAtributos = calcularEntropiaTotalXAtributo(clase.nombre, dataSet);
+  const entropiaTotalAtributos = calcularEntropiaTotalXAtributo(clase.nombre, dataSet, baseLogN);
   const calculoGananciaInform = calculoGananciaInformacion(
     entropiaTotalAtributos,
     entropiaConjunto
@@ -352,12 +372,12 @@ export const expansionAlgoritmo = (dataSet, umbral) => {
       valorAtributo: rama.valorAtributo,
       nodoPuro: rama.nodoPuro,
       nodo: gananciaMaxima.atributo,
-      ramas: expansionAlgoritmo(rama.filas, umbral),
+      ramas: expansionAlgoritmo(rama.filas, umbral, baseLogN),
     };
   });
 };
 
-export const expansionAlgoritmoConTG = (dataSet, umbral) => {
+export const expansionAlgoritmoConTG = (dataSet, umbral, baseLogN) => {
   // caso base
   if (dataSet.length === 0) {
     return [];
@@ -368,12 +388,12 @@ export const expansionAlgoritmoConTG = (dataSet, umbral) => {
     return [];
   }
   const listadoValoresClases = listadoValoresColumna(dataSet, clase.nombre);
-  const entropiaConjunto = calculoEntropíaConjunto(listadoValoresClases);
+  const entropiaConjunto = calculoEntropíaConjunto(listadoValoresClases, baseLogN);
   // caso base, si nodo es puro
   if (entropiaConjunto === 0) {
     return [];
   }
-  const entropiaTotalAtributos = calcularEntropiaTotalXAtributo(clase.nombre, dataSet);
+  const entropiaTotalAtributos = calcularEntropiaTotalXAtributo(clase.nombre, dataSet, baseLogN);
   const calculoGananciaInform = calculoTasaGananciaInformacion(
     entropiaTotalAtributos,
     entropiaConjunto
@@ -391,7 +411,7 @@ export const expansionAlgoritmoConTG = (dataSet, umbral) => {
       valorAtributo: rama.valorAtributo,
       nodoPuro: rama.nodoPuro,
       nodo: gananciaMaxima.atributo,
-      ramas: expansionAlgoritmo(rama.filas, umbral),
+      ramas: expansionAlgoritmoConTG(rama.filas, umbral, baseLogN),
     };
   });
 };
@@ -454,11 +474,17 @@ export const formatearDatos = (datos) => {
 };
 
 export const calcularC45 = (dataSet, umbral) => {
-  const data = expansionAlgoritmo(dataSet, umbral);
+  const baseLogN = cantidadApariciones(
+    listadoValoresColumna(dataSet, posicionClase(dataSet).nombre)
+  ).length;
+  const data = expansionAlgoritmo(dataSet, umbral, baseLogN);
   return formatearDatos(data);
 };
 
 export const calcularC45_TG = (dataSet, umbral) => {
-  const data = expansionAlgoritmoConTG(dataSet, umbral);
+  const baseLogN = cantidadApariciones(
+    listadoValoresColumna(dataSet, posicionClase(dataSet).nombre)
+  ).length;
+  const data = expansionAlgoritmoConTG(dataSet, umbral, baseLogN);
   return formatearDatos(data);
 };
