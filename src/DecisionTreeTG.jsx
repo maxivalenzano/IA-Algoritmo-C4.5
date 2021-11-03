@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-// import dataSet from './conjuntoEntrenamiento2';
 import { calcularC45_TG } from './funciones';
 import Tree from 'react-d3-tree';
 import { useCenteredTree, renderRectSvgNode } from './useCenteredTree';
@@ -21,7 +20,7 @@ const DecisionTree = ({ csv, umbral = 0, width, height }) => {
 
   const handleNodeClick = (nodeDatum) => {
     swal({
-      text: nodeDatum.children ? 'este es un Nodo rama' : 'este es un nodo hoja',
+      text: `Atributo: ${nodeDatum.attributes.department}, Entropía: ${nodeDatum.attributes.entropy}`,
     });
   };
   return (

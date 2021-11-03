@@ -29,7 +29,7 @@ export const renderRectSvgNode = ({ nodeDatum, toggleNode, handleNodeClick }) =>
           rama: {nodeDatum.attributes?.department}
         </text>
         {/* <text fill="black" x="20" dy="40" strokeWidth="1">
-          otro: {nodeDatum.attributes?.department}
+          entropía: {nodeDatum.attributes?.entropy}
         </text> */}
       </>
     )}
