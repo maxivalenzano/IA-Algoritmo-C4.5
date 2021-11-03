@@ -405,6 +405,7 @@ export const auxFormateoDatos = (datos) => {
     return [];
   }
   return datos.map((nodo) => {
+    console.log('🚀 ~ file: funciones.js ~ line 408 ~ returndatos.map ~ nodo', nodo);
     const nameNodo = nodo.ramas[0]?.nodo
       ? `Nodo: ${nodo.ramas[0]?.nodo}`
       : nodo.nodoPuro?.nodoPuro?.campoClase
@@ -413,7 +414,8 @@ export const auxFormateoDatos = (datos) => {
     return nodo.ramas.length === 0
       ? {
           name: nameNodo,
-          info: nodo.gananciaMax,
+          info: nodo.ramas[0]?.gananciaMax,
+          anterior: nodo.gananciaMax,
           attributes: {
             atributo: nodo.valorAtributo.campo,
             entropy: nodo.valorAtributo.entropia
@@ -421,7 +423,8 @@ export const auxFormateoDatos = (datos) => {
         }
       : {
           name: nameNodo,
-          info: nodo.gananciaMax,
+          info: nodo.ramas[0]?.gananciaMax,
+          anterior: nodo.gananciaMax,
           attributes: {
             atributo: nodo.valorAtributo.campo,
             entropy: nodo.valorAtributo.entropia
@@ -440,6 +443,7 @@ console.log('🚀 ~ file: funciones.js ~ line 433 ~ formatearDatos ~ datos', dat
     name: datos[0].nodo,
     info: datos[0].gananciaMax,
     children: datos.map((nodo) => {
+      console.log('🚀 ~ file: funciones.js ~ line 444 ~ children:datos.map ~ nodo', nodo);
       const nameNodo = nodo.ramas[0]?.nodo
         ? `Nodo: ${nodo.ramas[0]?.nodo}`
         : nodo.nodoPuro?.nodoPuro?.campoClase
@@ -448,7 +452,8 @@ console.log('🚀 ~ file: funciones.js ~ line 433 ~ formatearDatos ~ datos', dat
       return nodo.ramas.length === 0
         ? {
             name: nameNodo,
-            info: nodo.gananciaMax,
+            info: nodo.ramas[0]?.gananciaMax,
+            anterior: nodo.gananciaMax,
             attributes: {
               atributo: nodo.valorAtributo.campo,
               entropy: nodo.valorAtributo.entropia
@@ -456,7 +461,8 @@ console.log('🚀 ~ file: funciones.js ~ line 433 ~ formatearDatos ~ datos', dat
           }
         : {
             name: nameNodo,
-            info: nodo.gananciaMax,
+            info: nodo.ramas[0]?.gananciaMax,
+            anterior: nodo.gananciaMax,
             attributes: {
               atributo: nodo.valorAtributo.campo,
               entropy: nodo.valorAtributo.entropia

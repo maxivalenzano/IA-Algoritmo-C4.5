@@ -18,33 +18,56 @@ const DecisionTree = ({ csv, umbral = 0, height, width }) => {
   }, [csv, umbral]);
 
   const handleNodeClick = (nodeDatum) => {
+    const total = nodeDatum.info?.cantXClase[0]?.atributoTotal.reduce((acc, curr) => {
+      return acc + curr.cant;
+    }, 0);
     swal({
       content: (
         <div>
           <h3>{nodeDatum.name}</h3>
           <p>Ganancia: {(nodeDatum.info?.ganancia).toFixed(4) || ''}</p>
+          {nodeDatum.info && <p>Lista atributos:</p>}
+          {nodeDatum.info &&
+            nodeDatum.info?.cantXClase[0]?.atributoTotal.map((item) => {
+              return (
+                <p>
+                  {item.campo}: {item.cant} / {total}
+                </p>
+              );
+            })}
         </div>
       ),
       buttons: true,
     });
   };
   const handleRamaClick = (nodeDatum) => {
-    const total = nodeDatum.info?.cantXClase[0]?.atributoTotal.reduce((acc, curr) => { return acc + curr.cant }, 0);
-    const find = nodeDatum.info?.cantXClase[0]?.atributoTotal?.find(
+    console.log('🚀 ~ file: DecisionTree.jsx ~ line 44 ~ handleRamaClick ~ nodeDatum', nodeDatum);
+    const total = nodeDatum.anterior?.cantXClase[0]?.atributoTotal.reduce((acc, curr) => { return acc + curr.cant }, 0);
+    const totalRama = nodeDatum.info?.cantXClase[0]?.atributoTotal.reduce((acc, curr) => { return acc + curr.cant }, 0);
+    const find = nodeDatum.anterior?.cantXClase[0]?.atributoTotal?.find(
       (item) => item.campo === nodeDatum.attributes?.atributo
     );
     swal({
       content: (
         <div>
-          <h3>{nodeDatum.info.atributo}: {nodeDatum.attributes?.atributo || ''}</h3>
-          {nodeDatum.info && <>
+          <h3>{nodeDatum.anterior?.atributo}: {nodeDatum.attributes?.atributo || ''}</h3>
+          {nodeDatum.info ? <>
             <p>Cantidad: {find?.cant || ''} / {total}</p>
             <p>Entropía: {(nodeDatum.attributes?.entropy).toFixed(4) || ''}</p>
-          </>}
+          </> : <p>Cantidad: {find.cant}</p>}
           <h3>{nodeDatum.name}</h3>
           {nodeDatum.info && <>
             <p>Ganancia: {(nodeDatum.info?.ganancia)?.toFixed(4) || ''}</p>
           </>}
+          {nodeDatum.info && <p>Lista atributos:</p>}
+          {nodeDatum.info &&
+            nodeDatum.info?.cantXClase[0]?.atributoTotal.map((item) => {
+              return (
+                <p>
+                  {item.campo}: {item.cant} / {totalRama}
+                </p>
+              );
+            })}
         </div>
       )
     });
