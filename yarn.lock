@@ -11077,7 +11077,7 @@
     "unquote" "~1.1.1"
     "util.promisify" "~1.0.0"
 
-"sweetalert@^2.1.x":
+"sweetalert@^2.1.2", "sweetalert@^2.1.x":
   "integrity" "sha512-iWx7X4anRBNDa/a+AdTmvAzQtkN1+s4j/JJRWlHpYE8Qimkohs8/XnFcWeYHH2lMA8LRCa5tj2d244If3S/hzA=="
   "resolved" "https://registry.npmjs.org/sweetalert/-/sweetalert-2.1.2.tgz"
   "version" "2.1.2"
