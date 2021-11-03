@@ -77,6 +77,9 @@ const App = () => {
         </Container>
       ) : (
         <>
+          <Box py={2} px={'10vw'} display="flex" justifyContent="center">
+            <Typography variant="h4">Análisis Comparativo - Árboles de decisión</Typography>
+          </Box>
           <Box pb={2} px={'10vw'} display="flex" justifyContent="center">
             <Box px={2}>
               <Button
@@ -92,7 +95,7 @@ const App = () => {
             </Box>
             <Box px={2}>
               <Button
-                style={{ backgroundColor: viewTree1 ? '#F0CCE3' : '#C0D4F0' }}
+                style={{ backgroundColor: (viewTree1 && viewTree2) ? '#C0D4F0' : viewTree1 ? '#F0CCE3' : '#C0D4F0' }}
                 variant="contained"
                 onClick={() => {
                   setViewTree1(true);
@@ -105,7 +108,7 @@ const App = () => {
             </Box>
             <Box px={2} align="center">
               <Button
-                style={{ backgroundColor: viewTree2 ? '#F0CCE3' : '#C0D4F0' }}
+                style={{ backgroundColor: (viewTree1 && viewTree2) ? '#C0D4F0' : viewTree2 ? '#F0CCE3' : '#C0D4F0' }}
                 variant="contained"
                 onClick={() => {
                   setViewTree1(false);
@@ -118,7 +121,7 @@ const App = () => {
             </Box>
             <Box px={2}>
               <Button
-                style={{ backgroundColor: '#C0D4F0' }}
+                style={{ backgroundColor: (viewTree1 && viewTree2) ? '#F0CCE3' : '#C0D4F0' }}
                 variant="contained"
                 onClick={() => {
                   setViewTree1(true);
