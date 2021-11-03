@@ -59,7 +59,7 @@ const App = () => {
             <Grid item>
               <input
                 required
-                cssClass="box"
+                cssclass="box"
                 value={umbral}
                 onChange={(e) => setUmbral(e.target.value)}
                 type="number"

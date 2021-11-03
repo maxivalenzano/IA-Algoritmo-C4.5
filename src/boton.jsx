@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Button } from '@material-ui/core';
-import swal from 'sweetalert';
+import swal from '@sweetalert/with-react';
 import './styles.css';
 
 //Función que renderiza el boton de cargar los datos
@@ -25,7 +25,7 @@ function BotonCargar({ umbral, archivoCSV, setPage1 }) {
   return (
     <Box align="center">
       <Button onClick={nextPage} style={{ backgroundColor: '#C0D4F0' }}  size="large">
-        Cargar datos
+        Graficar Árboles
       </Button>
     </Box>
   );
