@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-// import dataSet from './conjuntoEntrenamiento2';
 import { calcularC45 } from './funciones';
 import Tree from 'react-d3-tree';
 import { Box } from '@material-ui/core';
 import { useCenteredTree, renderRectSvgNode } from './useCenteredTree';
-import swal from 'sweetalert';
+import swal from '@sweetalert/with-react';
 import './styles.css';
 
 const DecisionTree = ({ csv, umbral = 0, height, width }) => {
@@ -20,7 +19,34 @@ const DecisionTree = ({ csv, umbral = 0, height, width }) => {
 
   const handleNodeClick = (nodeDatum) => {
     swal({
-      text: nodeDatum.children ? 'este es un Nodo rama' : 'este es un nodo hoja',
+      content: (
+        <div>
+          <h3>{nodeDatum.name}</h3>
+          <p>Ganancia: {(nodeDatum.info?.ganancia).toFixed(4) || ''}</p>
+        </div>
+      ),
+      buttons: true,
+    });
+  };
+  const handleRamaClick = (nodeDatum) => {
+    const total = nodeDatum.info?.cantXClase[0]?.atributoTotal.reduce((acc, curr) => { return acc + curr.cant }, 0);
+    const find = nodeDatum.info?.cantXClase[0]?.atributoTotal?.find(
+      (item) => item.campo === nodeDatum.attributes?.atributo
+    );
+    swal({
+      content: (
+        <div>
+          <h3>{nodeDatum.info.atributo}: {nodeDatum.attributes?.atributo || ''}</h3>
+          {nodeDatum.info && <>
+            <p>Cantidad: {find?.cant || ''} / {total}</p>
+            <p>Entropía: {(nodeDatum.attributes?.entropy).toFixed(4) || ''}</p>
+          </>}
+          <h3>{nodeDatum.name}</h3>
+          {nodeDatum.info && <>
+            <p>Ganancia: {(nodeDatum.info?.ganancia)?.toFixed(4) || ''}</p>
+          </>}
+        </div>
+      )
     });
   };
   return (
@@ -29,7 +55,7 @@ const DecisionTree = ({ csv, umbral = 0, height, width }) => {
         data={jsonValuesC45}
         translate={translate}
         renderCustomNodeElement={(rd3tProps) =>
-          renderRectSvgNode({ ...rd3tProps, handleNodeClick })
+          renderRectSvgNode({ ...rd3tProps, handleNodeClick, handleRamaClick })
         }
         orientation="vertical"
       />

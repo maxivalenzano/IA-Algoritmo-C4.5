@@ -351,8 +351,9 @@ export const expansionAlgoritmo = (dataSet, umbral) => {
 
   return dataSetForExpansion.map((rama) => {
     return {
+      gananciaMax: rama.gananciaMax,
       valorAtributo: rama.valorAtributo,
-      nodoPuro: rama.nodoPuro,
+      nodoPuro: {clase: clase.nombre, nodoPuro: rama.nodoPuro},
       nodo: gananciaMaxima.atributo,
       ramas: expansionAlgoritmo(rama.filas, umbral),
     };
@@ -392,7 +393,7 @@ export const expansionAlgoritmoConTG = (dataSet, umbral) => {
     return {
       gananciaMax: rama.gananciaMax,
       valorAtributo: rama.valorAtributo,
-      nodoPuro: rama.nodoPuro,
+      nodoPuro: {clase: clase.nombre, nodoPuro: rama.nodoPuro},
       nodo: gananciaMaxima.atributo,
       ramas: expansionAlgoritmoConTG(rama.filas, umbral),
     };
@@ -406,21 +407,23 @@ export const auxFormateoDatos = (datos) => {
   return datos.map((nodo) => {
     const nameNodo = nodo.ramas[0]?.nodo
       ? `Nodo: ${nodo.ramas[0]?.nodo}`
-      : nodo.nodoPuro.campoClase
-      ? `valorClase: ${nodo.nodoPuro.campoClase}`
+      : nodo.nodoPuro?.nodoPuro?.campoClase
+      ? `${nodo.nodoPuro.clase}: ${nodo.nodoPuro.nodoPuro?.campoClase}`
       : 'NodoImpuro';
     return nodo.ramas.length === 0
       ? {
           name: nameNodo,
+          info: nodo.gananciaMax,
           attributes: {
-            department: nodo.valorAtributo.campo,
+            atributo: nodo.valorAtributo.campo,
             entropy: nodo.valorAtributo.entropia
           },
         }
       : {
           name: nameNodo,
+          info: nodo.gananciaMax,
           attributes: {
-            department: nodo.valorAtributo.campo,
+            atributo: nodo.valorAtributo.campo,
             entropy: nodo.valorAtributo.entropia
           },
           children: auxFormateoDatos(nodo.ramas),
@@ -429,29 +432,33 @@ export const auxFormateoDatos = (datos) => {
 };
 
 export const formatearDatos = (datos) => {
+console.log('🚀 ~ file: funciones.js ~ line 433 ~ formatearDatos ~ datos', datos);
   if (datos.length === 0) {
     return [];
   }
   return {
     name: datos[0].nodo,
+    info: datos[0].gananciaMax,
     children: datos.map((nodo) => {
       const nameNodo = nodo.ramas[0]?.nodo
         ? `Nodo: ${nodo.ramas[0]?.nodo}`
-        : nodo.nodoPuro.campoClase
-        ? `valorClase: ${nodo.nodoPuro.campoClase}`
+        : nodo.nodoPuro?.nodoPuro?.campoClase
+        ? `${nodo.nodoPuro.clase}: ${nodo.nodoPuro.nodoPuro?.campoClase}`
         : 'NodoImpuro';
       return nodo.ramas.length === 0
         ? {
             name: nameNodo,
+            info: nodo.gananciaMax,
             attributes: {
-              department: nodo.valorAtributo.campo,
+              atributo: nodo.valorAtributo.campo,
               entropy: nodo.valorAtributo.entropia
             },
           }
         : {
             name: nameNodo,
+            info: nodo.gananciaMax,
             attributes: {
-              department: nodo.valorAtributo.campo,
+              atributo: nodo.valorAtributo.campo,
               entropy: nodo.valorAtributo.entropia
             },
             children: auxFormateoDatos(nodo.ramas),
