@@ -20,14 +20,6 @@ body {
   font-size: 50px;
 }
 
-/*
-.area {
-    background: #c1d8fc;
-    background: -webkit-linear-gradient(to left, #b42f18, #ee5f34);
-    width: 100%;
-    height: 100vh;
-}
-*/
 .circles {
   position: absolute;
   top: 0;

@@ -232,7 +232,8 @@ export const filtradoSegunAtributoGananciaMaxima = (gananciaMax, dataSet, nombre
       }
 
       return {
-        valorAtributo: valor.campo,
+        gananciaMax: gananciaMax,
+        valorAtributo: valor,
         filas: [],
         nodoPuro: campoPuro,
       };
@@ -254,7 +255,8 @@ export const filtradoSegunAtributoGananciaMaxima = (gananciaMax, dataSet, nombre
     }
 
     return {
-      valorAtributo: valor.campo,
+      gananciaMax: gananciaMax,
+      valorAtributo: valor,
       filas: filtrados,
       nodoPuro: campoPuro,
     };
@@ -349,8 +351,9 @@ export const expansionAlgoritmo = (dataSet, umbral) => {
 
   return dataSetForExpansion.map((rama) => {
     return {
+      gananciaMax: rama.gananciaMax,
       valorAtributo: rama.valorAtributo,
-      nodoPuro: rama.nodoPuro,
+      nodoPuro: {clase: clase.nombre, nodoPuro: rama.nodoPuro},
       nodo: gananciaMaxima.atributo,
       ramas: expansionAlgoritmo(rama.filas, umbral),
     };
@@ -374,11 +377,11 @@ export const expansionAlgoritmoConTG = (dataSet, umbral) => {
     return [];
   }
   const entropiaTotalAtributos = calcularEntropiaTotalXAtributo(clase.nombre, dataSet);
-  const calculoGananciaInform = calculoTasaGananciaInformacion(
+  const calculoTasaGanancia = calculoTasaGananciaInformacion(
     entropiaTotalAtributos,
     entropiaConjunto
   );
-  const gananciaMaxima = maximoGanancia(calculoGananciaInform);
+  const gananciaMaxima = maximoGanancia(calculoTasaGanancia);
   const dataSetForExpansion = filtradoSegunAtributoGananciaMaxima(
     gananciaMaxima,
     dataSet,
@@ -388,10 +391,11 @@ export const expansionAlgoritmoConTG = (dataSet, umbral) => {
 
   return dataSetForExpansion.map((rama) => {
     return {
+      gananciaMax: rama.gananciaMax,
       valorAtributo: rama.valorAtributo,
-      nodoPuro: rama.nodoPuro,
+      nodoPuro: {clase: clase.nombre, nodoPuro: rama.nodoPuro},
       nodo: gananciaMaxima.atributo,
-      ramas: expansionAlgoritmo(rama.filas, umbral),
+      ramas: expansionAlgoritmoConTG(rama.filas, umbral),
     };
   });
 };
@@ -403,20 +407,26 @@ export const auxFormateoDatos = (datos) => {
   return datos.map((nodo) => {
     const nameNodo = nodo.ramas[0]?.nodo
       ? `Nodo: ${nodo.ramas[0]?.nodo}`
-      : nodo.nodoPuro.campoClase
-      ? `valorClase: ${nodo.nodoPuro.campoClase}`
+      : nodo.nodoPuro?.nodoPuro?.campoClase
+      ? `${nodo.nodoPuro.clase}: ${nodo.nodoPuro.nodoPuro?.campoClase}`
       : 'NodoImpuro';
     return nodo.ramas.length === 0
       ? {
           name: nameNodo,
+          info: nodo.ramas[0]?.gananciaMax,
+          anterior: nodo.gananciaMax,
           attributes: {
-            department: nodo.valorAtributo,
+            atributo: nodo.valorAtributo.campo,
+            entropy: nodo.valorAtributo.entropia
           },
         }
       : {
           name: nameNodo,
+          info: nodo.ramas[0]?.gananciaMax,
+          anterior: nodo.gananciaMax,
           attributes: {
-            department: nodo.valorAtributo,
+            atributo: nodo.valorAtributo.campo,
+            entropy: nodo.valorAtributo.entropia
           },
           children: auxFormateoDatos(nodo.ramas),
         };
@@ -429,23 +439,30 @@ export const formatearDatos = (datos) => {
   }
   return {
     name: datos[0].nodo,
+    info: datos[0].gananciaMax,
     children: datos.map((nodo) => {
       const nameNodo = nodo.ramas[0]?.nodo
         ? `Nodo: ${nodo.ramas[0]?.nodo}`
-        : nodo.nodoPuro.campoClase
-        ? `valorClase: ${nodo.nodoPuro.campoClase}`
+        : nodo.nodoPuro?.nodoPuro?.campoClase
+        ? `${nodo.nodoPuro.clase}: ${nodo.nodoPuro.nodoPuro?.campoClase}`
         : 'NodoImpuro';
       return nodo.ramas.length === 0
         ? {
             name: nameNodo,
+            info: nodo.ramas[0]?.gananciaMax,
+            anterior: nodo.gananciaMax,
             attributes: {
-              department: nodo.valorAtributo,
+              atributo: nodo.valorAtributo.campo,
+              entropy: nodo.valorAtributo.entropia
             },
           }
         : {
             name: nameNodo,
+            info: nodo.ramas[0]?.gananciaMax,
+            anterior: nodo.gananciaMax,
             attributes: {
-              department: nodo.valorAtributo,
+              atributo: nodo.valorAtributo.campo,
+              entropy: nodo.valorAtributo.entropia
             },
             children: auxFormateoDatos(nodo.ramas),
           };
@@ -458,6 +475,7 @@ export const calcularC45 = (dataSet, umbral) => {
   return formatearDatos(data);
 };
 
+// funcion que llama al algoritmo y con la funciona que nos grafica
 export const calcularC45_TG = (dataSet, umbral) => {
   const data = expansionAlgoritmoConTG(dataSet, umbral);
   return formatearDatos(data);
