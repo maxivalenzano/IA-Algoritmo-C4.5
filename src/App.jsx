@@ -26,7 +26,6 @@ const App = () => {
 
   const handleForce = (data, fileInfo) => {
     setArchivoCSV(data);
-    console.log(data, fileInfo);
   };
   const papaparseOptions = {
     header: true,

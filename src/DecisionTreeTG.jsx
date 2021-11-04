@@ -51,7 +51,6 @@ const DecisionTree = ({ csv, umbral = 0, width, height }) => {
           <h3>{nodeDatum.anterior?.atributo}: {nodeDatum.attributes?.atributo || ''}</h3>
           {nodeDatum.info ? <>
             <p>Cantidad: {find?.cant || ''} / {total}</p>
-            <p>Entropía: {(nodeDatum.attributes?.entropy).toFixed(4) || ''}</p>
           </> : <p>Cantidad: {find.cant}</p>}
           <h3>{nodeDatum.name}</h3>
           {nodeDatum.info && <>

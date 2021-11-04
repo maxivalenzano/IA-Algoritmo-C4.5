@@ -405,7 +405,6 @@ export const auxFormateoDatos = (datos) => {
     return [];
   }
   return datos.map((nodo) => {
-    console.log('🚀 ~ file: funciones.js ~ line 408 ~ returndatos.map ~ nodo', nodo);
     const nameNodo = nodo.ramas[0]?.nodo
       ? `Nodo: ${nodo.ramas[0]?.nodo}`
       : nodo.nodoPuro?.nodoPuro?.campoClase
@@ -435,7 +434,6 @@ export const auxFormateoDatos = (datos) => {
 };
 
 export const formatearDatos = (datos) => {
-console.log('🚀 ~ file: funciones.js ~ line 433 ~ formatearDatos ~ datos', datos);
   if (datos.length === 0) {
     return [];
   }
@@ -443,7 +441,6 @@ console.log('🚀 ~ file: funciones.js ~ line 433 ~ formatearDatos ~ datos', dat
     name: datos[0].nodo,
     info: datos[0].gananciaMax,
     children: datos.map((nodo) => {
-      console.log('🚀 ~ file: funciones.js ~ line 444 ~ children:datos.map ~ nodo', nodo);
       const nameNodo = nodo.ramas[0]?.nodo
         ? `Nodo: ${nodo.ramas[0]?.nodo}`
         : nodo.nodoPuro?.nodoPuro?.campoClase

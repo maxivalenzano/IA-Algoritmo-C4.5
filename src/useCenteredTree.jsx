@@ -12,7 +12,6 @@ export const useCenteredTree = (defaultTranslate = { x: 0, y: 0 }) => {
 };
 
 export const renderRectSvgNode = ({ nodeDatum, toggleNode, handleNodeClick, handleRamaClick }) => {
-  console.log('🚀 ~ file: useCenteredTree.jsx ~ line 15 ~ renderRectSvgNode ~ nodeDatum', nodeDatum);
   return (
     <g>
       <circle r="15" x="-10" onClick={toggleNode} />
