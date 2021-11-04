@@ -32,7 +32,7 @@ export const logN = (n, m) => {
   return Math.log(n) / Math.log(m);
 };
 
-// devuelve un objeto con cada nombre de atributo y su cantidad de aparicion
+// devuelve un objeto con cada nombre de atributo y la cantidad de veces que aparece
 export const cantidadApariciones = (arr) => {
   const counts = {};
   for (var i = 0; i < arr.length; i++) {
@@ -60,6 +60,7 @@ export const calculoEntropíaConjunto = (columnaDeLaClase) => {
   return entropia;
 };
 
+// devuelve un listado de Atributos Separados Por valor de Clase y su cantidad de apariciones
 export const listadoDeAtributosSeparadosPorColumna = (nombreClase, dataSet) => {
   const columnas = listadoTituloColumnas(dataSet);
   const listaAtributos = columnas.filter((item) => item !== nombreClase);
@@ -87,6 +88,7 @@ export const listadoDeAtributosSeparadosPorColumna = (nombreClase, dataSet) => {
   });
 };
 
+// funcion que suma las entropias parciales de cada atributo y devuelve las entropias de los valores de cada atributo
 export const sumaEntropía = (calculosPorClase) => {
   let entropiasTotales = {};
   calculosPorClase.forEach((item) => {
@@ -104,7 +106,8 @@ export const sumaEntropía = (calculosPorClase) => {
   return entropyToObject;
 };
 
-export const calculoEntropíaIndividual = (atributo, cantValorPorAtributo) => {
+// calcula las entropias de cada termino de cada valor de atributo (es un calculo parcial, luego se pasa a SumaEntropía)
+export const calculoEntropiaParcialPorValorAtributoPorValorClase = (atributo, cantValorPorAtributo) => {
   return atributo.filtradoSegunClase.map((clase) => {
     const atributoTotal = cantValorPorAtributo.find(
       (item) => String(item.atributo) === String(atributo.atributo)
@@ -133,6 +136,7 @@ export const calculoEntropíaIndividual = (atributo, cantValorPorAtributo) => {
   });
 };
 
+// devuelve un objeto con cada nombre de atributo y la cantidad de veces que aparece
 export const cantValorPorAtributo = (listaAtributos, conjuntoDeDatos) => {
   return listaAtributos.map((atributo) => {
     const result = cantidadApariciones(listadoValoresColumna(conjuntoDeDatos, atributo));
@@ -143,6 +147,7 @@ export const cantValorPorAtributo = (listaAtributos, conjuntoDeDatos) => {
   });
 };
 
+// funcion que selecciona el atributo con mayor ganancia o tasa de ganancia
 export const maximoGanancia = (conjunto) => {
   const onlyGanancia = conjunto.map((item) => item.ganancia);
   const max = Math.max(...onlyGanancia);
@@ -150,6 +155,7 @@ export const maximoGanancia = (conjunto) => {
   return busqueda;
 };
 
+// devuelve la ganancia de informacion de un atributo
 export const calculoGananciaInformacion = (entropiaTotalAtributos, entropiaConjunto) => {
   return entropiaTotalAtributos.map((item) => {
     const ganancia = entropiaConjunto - item.entropia;
@@ -162,6 +168,7 @@ export const calculoGananciaInformacion = (entropiaTotalAtributos, entropiaConju
   });
 };
 
+// devuelve la tasa de ganancia de informacion de un atributo
 export const calculoTasaGananciaInformacion = (entropiaTotalAtributos, entropiaConjunto) => {
   return entropiaTotalAtributos.map((item) => {
     const atributosTotales = item.cantXclases[0].atributoTotal;
@@ -184,6 +191,7 @@ export const calculoTasaGananciaInformacion = (entropiaTotalAtributos, entropiaC
   });
 };
 
+// devuelve un nuevo dataSet sin las filas de aquellos valores de atributo que se correspondan con un solo valor de clase
 export const reducirTabla = (gananciaMax, atributos) => {
   let nuevoDataSet = atributos;
   const camposPuros = gananciaMax.entropiasIndividuales
@@ -195,6 +203,7 @@ export const reducirTabla = (gananciaMax, atributos) => {
   return nuevoDataSet;
 };
 
+// funcion obsoleta
 export const filterConjunto = (conjunto, clase) => {
   const filtered = conjunto.map((item) => {
     return omit(item, clase);
@@ -202,6 +211,7 @@ export const filterConjunto = (conjunto, clase) => {
   return filtered;
 };
 
+// busca en el atributo de mayor ganancia, toda la informacion respecto al valor de clase que le pasemos
 export const busquedaCampoClase = (gananciaMax, valor) => {
   const busqueda = gananciaMax.cantXClase.find((campoClase) =>
     campoClase.entropias?.find(
@@ -211,22 +221,31 @@ export const busquedaCampoClase = (gananciaMax, valor) => {
   return busqueda.entropias.find((item) => String(item.campoAtributo) === String(valor.campo));
 };
 
+// funcion que devuelve el nuevo dataSet para su recursion
 export const filtradoSegunAtributoGananciaMaxima = (gananciaMax, dataSet, nombreClase, umbral) => {
+  // llama a la funcion que elimina los puros del dataSet (si los hubiera)
   const nuevoDataSetSinPuros = reducirTabla(gananciaMax, dataSet);
+
+  // en base al nodo de mayor ganancia, por cada una de sus ramas, devuelve un dataSet reducido.
+  //  en caso de que alguna rama sea sea pura, devuelve un dataSet vacio, ademas de informacion acerca de cada atributo
   return gananciaMax.entropiasIndividuales.map((valor) => {
     let campoPuro = {};
+    // comparamos la ganancia o tasa de ganancia con el umbral ingresado
     if (gananciaMax.ganancia < umbral) {
       const valoresClasePorAtrib = gananciaMax.cantXClase.map((campoClase) => {
         return (
           campoClase.entropias.find((atributo) => atributo.campoAtributo === valor.campo) ?? {}
         );
       });
+      // buscamos el valor mas frecuente de clase por cada valor de atributo
       const maxValorClasePorAtrib = maxBy(valoresClasePorAtrib, function (item) {
         return item.cantAtributoXClase;
       });
+      // buscamos si hay mas de 1 valor frecuente
       const valoresMaxDuplicados = valoresClasePorAtrib.filter(
         (item) => item.cantAtributoXClase === maxValorClasePorAtrib.cantAtributoXClase
       );
+      // verifica si el valor mas frecuente es unico, en caso de ser unico es un nodo puro
       if (valoresMaxDuplicados.length === 1) {
         campoPuro = maxValorClasePorAtrib;
       }
@@ -238,18 +257,23 @@ export const filtradoSegunAtributoGananciaMaxima = (gananciaMax, dataSet, nombre
         nodoPuro: campoPuro,
       };
     }
+    // tratamiento por si la ganancia es mayor al umbral 
     const result = nuevoDataSetSinPuros.filter((item) => {
       return String(item[gananciaMax.atributo]) === String(valor.campo);
     });
 
+      // si el nuevo dataSet es vacio, lo clasifica como puro para ese valor de atributo
     if (result.length === 0) {
       campoPuro = busquedaCampoClase(gananciaMax, valor);
     }
+
+    // prepara el nuevo dataSet, eliminando toda la columna del atributo con mayor ganancia
     const filtrados = result.map((fila) => omit(fila, gananciaMax.atributo));
+
+    // verificamos si la entropia del futuro conjunto a evaluar es 0, para resguardar informacion
     const entropiaFuturoConjunto = calculoEntropíaConjunto(
       listadoValoresColumna(filtrados, nombreClase)
     );
-
     if (entropiaFuturoConjunto === 0) {
       campoPuro = busquedaCampoClase(gananciaMax, valor);
     }
@@ -263,10 +287,10 @@ export const filtradoSegunAtributoGananciaMaxima = (gananciaMax, dataSet, nombre
   });
 };
 
+// calcula la entropia individual de cada valor de atributo
 export const calculoEntropiaIndividual = (claseNombre, dataSet) => {
   const columnas = listadoTituloColumnas(dataSet);
   const listaAtributos = columnas.filter((item) => item !== claseNombre);
-
   // de esta variable
   const listadoAtributosSeparadosPorClase = listadoDeAtributosSeparadosPorColumna(
     claseNombre,
@@ -276,8 +300,7 @@ export const calculoEntropiaIndividual = (claseNombre, dataSet) => {
   const cantValorPorAtributoConst = cantValorPorAtributo(listaAtributos, dataSet);
 
   const calculosEntropíaIndividual = listadoAtributosSeparadosPorClase.map((atributo) => {
-    // buscar valores aquí de la cantidad por atributos
-    const calculosPorClase = calculoEntropíaIndividual(atributo, cantValorPorAtributoConst);
+    const calculosPorClase = calculoEntropiaParcialPorValorAtributoPorValorClase(atributo, cantValorPorAtributoConst);
     const entropiaTotal = sumaEntropía(calculosPorClase);
     return {
       atributo: atributo.atributo,
@@ -289,6 +312,7 @@ export const calculoEntropiaIndividual = (claseNombre, dataSet) => {
   return calculosEntropíaIndividual;
 };
 
+// calcula la entropia individual de cada atributo
 export const calcularEntropiaTotalXAtributo = (nombreClase, dataSet) => {
   const listadoValoresClases = listadoValoresColumna(dataSet, nombreClase);
 
@@ -320,6 +344,7 @@ export const calcularEntropiaTotalXAtributo = (nombreClase, dataSet) => {
   return entropiaTotalAtributos;
 };
 
+// funcion recursiva utilizando la Ganancia
 export const expansionAlgoritmo = (dataSet, umbral) => {
   // caso base
   if (dataSet.length === 0) {
@@ -360,6 +385,7 @@ export const expansionAlgoritmo = (dataSet, umbral) => {
   });
 };
 
+  // funcion recursiva utilizando la Tasa de Ganancia
 export const expansionAlgoritmoConTG = (dataSet, umbral) => {
   // caso base
   if (dataSet.length === 0) {
@@ -400,6 +426,7 @@ export const expansionAlgoritmoConTG = (dataSet, umbral) => {
   });
 };
 
+//funcion auxiliar que nos formatea los datos de salida en un JSON para la librería gráfica
 export const auxFormateoDatos = (datos) => {
   if (datos.length === 0) {
     return [];
@@ -433,6 +460,7 @@ export const auxFormateoDatos = (datos) => {
   });
 };
 
+//funcion que nos formatea los datos de salida en un JSON para la librería gráfica
 export const formatearDatos = (datos) => {
   if (datos.length === 0) {
     return [];
@@ -470,12 +498,13 @@ export const formatearDatos = (datos) => {
   };
 };
 
+// funcion que combina el algoritmo de expansion y el formateo de salida
 export const calcularC45 = (dataSet, umbral) => {
   const data = expansionAlgoritmo(dataSet, umbral);
   return formatearDatos(data);
 };
 
-// funcion que llama al algoritmo y con la funciona que nos grafica
+// funcion que combina el algoritmo de expansion y el formateo de salida
 export const calcularC45_TG = (dataSet, umbral) => {
   const data = expansionAlgoritmoConTG(dataSet, umbral);
   return formatearDatos(data);
