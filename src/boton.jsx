@@ -10,7 +10,7 @@ function BotonCargar({ umbral, archivoCSV, setPage1 }) {
     //Valida que estén ambos parámetros
     if (!archivoCSV) {
       swal({
-        text: 'Debes subir un archivo CSV',
+        text: 'Debes subir un archivo CSV de entrenamiento',
       });
       return null;
     }

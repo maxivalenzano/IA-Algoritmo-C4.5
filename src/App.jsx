@@ -15,6 +15,7 @@ const Footer = () => (
 
 const App = () => {
   const [archivoCSV, setArchivoCSV] = useState(null);
+  const [archivoCSVtest, setArchivoCSVtest] = useState(null);
   const [umbral, setUmbral] = useState(0);
   const [page1, setPage1] = useState(true);
   const [viewTree1, setViewTree1] = useState(true);
@@ -25,6 +26,11 @@ const App = () => {
   const handleForce = (data, fileInfo) => {
     setArchivoCSV(data);
   };
+
+  const handleForce2 = (data, fileInfo) => {
+    setArchivoCSVtest(data);
+  };
+
   const papaparseOptions = {
     header: true,
     dynamicTyping: true,
@@ -38,13 +44,26 @@ const App = () => {
           <p className="f1">Análisis Comparativo - Árboles de decisión</p>
           <Grid container justifyContent="center" alignItems="center" spacing={2}>
             <Grid item>
-              <Typography variant="h5">Seleccione un archivo CSV</Typography>
+              <Typography variant="h5">Seleccione el archivo CSV de entrenamiento</Typography>
             </Grid>
             <Grid item>
               <CSVReader
                 // cssClass={classes.input}
                 inputStyle={{ color: 'black' }}
                 onFileLoaded={handleForce}
+                parserOptions={papaparseOptions}
+              />
+            </Grid>
+          </Grid>
+          <Grid container justifyContent="center" alignItems="center" spacing={2}>
+            <Grid item>
+              <Typography variant="h5">Seleccione el archivo CSV de test</Typography>
+            </Grid>
+            <Grid item>
+              <CSVReader
+                // cssClass={classes.input}
+                inputStyle={{ color: 'black' }}
+                onFileLoaded={handleForce2}
                 parserOptions={papaparseOptions}
               />
             </Grid>
@@ -68,7 +87,7 @@ const App = () => {
             </Grid>
           </Grid>
           <Box pt={6}>
-            <BotonCargar archivoCSV={archivoCSV} umbral={umbral} setPage1={setPage1} />
+            <BotonCargar archivoCSV={archivoCSV} umbral={umbral} setPage1={setPage1} archivoCSVtest={archivoCSVtest}/>
           </Box>
           <Footer />
         </Container>
@@ -85,6 +104,7 @@ const App = () => {
                 onClick={() => {
                   setPage1(true);
                   setArchivoCSV(null);
+                  setArchivoCSVtest(null);
                   setUmbral(0);
                 }}>
                 Regresar al menú principal
@@ -127,6 +147,32 @@ const App = () => {
                   setWidthTrees('50vw');
                 }}>
                 Mostrar ambos
+              </Button>
+            </Box>
+            <Box px={2}>
+              <Button
+                style={{ backgroundColor: '#C0D4F0' }}
+                variant="contained"
+                onClick={() => {
+                  setViewTree1(false);
+                  setViewTree2(false);
+                  setSeeTwoTrees(6);
+                  setWidthTrees('50vw');
+                }}>
+                Testear
+              </Button>
+            </Box>
+            <Box px={2}>
+              <Button
+                style={{ backgroundColor: '#C0D4F0' }}
+                variant="contained"
+                onClick={() => {
+                  setViewTree1(false);
+                  setViewTree2(false);
+                  setSeeTwoTrees(6);
+                  setWidthTrees('50vw');
+                }}>
+                Ingresar Nueva Instancia
               </Button>
             </Box>
           </Box>
