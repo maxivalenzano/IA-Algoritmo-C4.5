@@ -2,6 +2,7 @@ import { omit, maxBy } from 'lodash-es';
 // devuelve los titulos de la primer fila
 export const listadoTituloColumnas = (datos) => {
   return Object.keys(datos[0]);
+  console.log('🚀 ~ file: funciones.js ~ line 4 ~ returnObject.keys(datos[0]) ~ listadoTituloColumnas', listadoTituloColumnas);
 };
 
 // devuelve el nombre de la clase (ultima fila)

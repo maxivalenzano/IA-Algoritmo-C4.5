@@ -4,6 +4,8 @@ import BotonCargar from './boton';
 import DecisionTree from './DecisionTree';
 import DecisionTreeTG from './DecisionTreeTG';
 import { Box, Container, Button, Typography, Grid } from '@material-ui/core';
+import swal from '@sweetalert/with-react';
+import { instanciar } from './funcionesInstanciar';
 import './styles.css';
 
 //Crea el footer de la página principal
@@ -15,7 +17,7 @@ const Footer = () => (
 
 const App = () => {
   const [archivoCSV, setArchivoCSV] = useState(null);
-  const [archivoCSVtest, setArchivoCSVtest] = useState(null);
+  const [archivoCSVtest, setArchivoCSVtest] = useState(true);
   const [umbral, setUmbral] = useState(0);
   const [page1, setPage1] = useState(true);
   const [viewTree1, setViewTree1] = useState(true);
@@ -30,6 +32,14 @@ const App = () => {
   const handleForce2 = (data, fileInfo) => {
     setArchivoCSVtest(data);
   };
+
+  function botonTestear(data){
+    if(!data) {
+      swal({
+        text: 'Debes subir un archivo CSV de entrenamiento',
+      });
+    }
+  }
 
   const papaparseOptions = {
     header: true,
@@ -87,7 +97,7 @@ const App = () => {
             </Grid>
           </Grid>
           <Box pt={6}>
-            <BotonCargar archivoCSV={archivoCSV} umbral={umbral} setPage1={setPage1} archivoCSVtest={archivoCSVtest}/>
+            <BotonCargar archivoCSV={archivoCSV} umbral={umbral} setPage1={setPage1}/>
           </Box>
           <Footer />
         </Container>
@@ -150,30 +160,34 @@ const App = () => {
               </Button>
             </Box>
             <Box px={2}>
-              <Button
+            <Button
                 style={{ backgroundColor: '#C0D4F0' }}
                 variant="contained"
-                onClick={() => {
-                  setViewTree1(false);
-                  setViewTree2(false);
-                  setSeeTwoTrees(6);
-                  setWidthTrees('50vw');
-                }}>
+                onClick={()=> {
+                    setViewTree1(true);
+                    setViewTree2(true);
+                    setSeeTwoTrees(6);
+                    setWidthTrees('50vw');
+                    setArchivoCSVtest(null)
+                    botonTestear(archivoCSVtest)
+                  }}>
                 Testear
-              </Button>
+              </Button> 
             </Box>
             <Box px={2}>
-              <Button
+            <Button
                 style={{ backgroundColor: '#C0D4F0' }}
                 variant="contained"
-                onClick={() => {
-                  setViewTree1(false);
-                  setViewTree2(false);
-                  setSeeTwoTrees(6);
-                  setWidthTrees('50vw');
-                }}>
-                Ingresar Nueva Instancia
-              </Button>
+                onClick={()=> {
+                    setViewTree1(true);
+                    setViewTree2(true);
+                    setSeeTwoTrees(6);
+                    setWidthTrees('50vw');
+                    setArchivoCSVtest(null)
+                    instanciar(archivoCSV)
+                  }}>
+                Clasificar Nueva Instancia
+              </Button> 
             </Box>
           </Box>
           <Grid container>
