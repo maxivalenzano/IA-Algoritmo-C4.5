@@ -1,12 +1,17 @@
 import { listadoTituloColumnas, listadoValoresColumna } from './funciones';
+import swal from '@sweetalert/with-react';
 
+//exporta la función instanciar
 export const instanciar = (data) => {
   atributos(data);
+  swal(
+    form(data)
+  )
+  
 }
-//esto es el arreglo con los nombres de los atributos
-//var nombresAtributos = listadoTituloColumnas(data)
-var opcionesAtributos = [];
 
+var opcionesAtributos = [];
+//arma el arreglo de arreglos => cada posición sería el nombre del atributo con sus posibles valores
 function atributos(data) {
   //atributos, o sea los nombres
   //console.log(listadoTituloColumnas(data).slice(0,-1))
@@ -26,25 +31,39 @@ function atributos(data) {
   var valueNoSeQue = listadoTituloColumnas(data).pop()
   //console.log(listaAtributos)
   //console.log(valueNoSeQue)
-  form(data)
 }
-
+//exporta la función del popup del formulario para una nueva instancia
 export default function form(data) {
-  
+  var listaAtributos = listadoTituloColumnas(data).slice(0, -1)
+
   return (
     <div>
       <form>
         {
-          listadoTituloColumnas(data).map(function(e, i) {
+          listaAtributos.map(function(e, i) {
             return (
               <div>
-                <h1>{e}</h1>
-                <select>{opcionesAtributos[i]}</select>
+                <label>{e + ":"}</label>
+                
+                <select>
+                  {
+                  opcionesAtributos[i].map(selectData =>{
+                    console.log(selectData)
+                    return(
+                      
+                        <option value={i}>{selectData}</option>
+                    
+                    )
+                  })
+                }
+                </select>
+                
               </div>      
             )
           }
         )}  
       </form>
+      <h5>{listadoTituloColumnas(data).pop()}</h5>
     </div>
   )
 }
