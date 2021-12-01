@@ -5,7 +5,7 @@ import DecisionTree from './DecisionTree';
 import DecisionTreeTG from './DecisionTreeTG';
 import { Box, Container, Button, Typography, Grid } from '@material-ui/core';
 import swal from '@sweetalert/with-react';
-import { instanciar } from './funcionesInstanciar';
+import { instanciar, displayHelp } from './funcionesInstanciar';
 import './styles.css';
 
 //Crea el footer de la página principal
@@ -39,6 +39,12 @@ const App = () => {
         text: 'Debes subir un archivo CSV de entrenamiento',
       });
     }
+  }
+
+  function displayH(){
+    swal(
+      displayHelp()
+    );
   }
 
   const papaparseOptions = {
@@ -107,6 +113,16 @@ const App = () => {
             <Typography variant="h4">Análisis Comparativo - Árboles de decisión</Typography>
           </Box>
           <Box pb={2} px={'10vw'} display="flex" justifyContent="center">
+          <Box px={2}>
+              <Button
+                style={{ backgroundColor: '#C0D4F0' }}
+                variant="contained"
+                onClick={() => {
+                  displayH();
+                }}>
+                Ayuda
+              </Button>
+            </Box>
             <Box px={2}>
               <Button
                 style={{ backgroundColor: '#C0D4F0' }}
