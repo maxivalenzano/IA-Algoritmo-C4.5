@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
-import CSVReader from 'react-csv-reader';
-import BotonCargar from './boton';
-import DecisionTree from './DecisionTree';
-import DecisionTreeTG from './DecisionTreeTG';
-import { Box, Container, Button, Typography, Grid } from '@material-ui/core';
-import swal from '@sweetalert/with-react';
-import { instanciar, displayHelp } from './funcionesInstanciar';
-import './styles.css';
+import React, { useState } from "react";
+import CSVReader from "react-csv-reader";
+import BotonCargar from "./boton";
+import DecisionTree from "./DecisionTree";
+import DecisionTreeTG from "./DecisionTreeTG";
+import { Box, Container, Button, Typography, Grid } from "@material-ui/core";
+import swal from "@sweetalert/with-react";
+import { instanciar, displayHelp } from "./funcionesInstanciar";
+import "./styles.css";
+import conjuntoEntrenamiento2 from "./conjuntoEntrenamiento2";
 
 //Crea el footer de la página principal
 const Footer = () => (
@@ -16,14 +17,14 @@ const Footer = () => (
 );
 
 const App = () => {
-  const [archivoCSV, setArchivoCSV] = useState(null);
-  const [archivoCSVtest, setArchivoCSVtest] = useState(true);
+  const [archivoCSV, setArchivoCSV] = useState(conjuntoEntrenamiento2);
+  const [archivoCSVtest, setArchivoCSVtest] = useState(conjuntoEntrenamiento2);
   const [umbral, setUmbral] = useState(0);
   const [page1, setPage1] = useState(true);
   const [viewTree1, setViewTree1] = useState(true);
   const [viewTree2, setViewTree2] = useState(true);
   const [seeTwoTrees, setSeeTwoTrees] = useState(6);
-  const [widthTrees, setWidthTrees] = useState('50vw');
+  const [widthTrees, setWidthTrees] = useState("50vw");
 
   const handleForce = (data, fileInfo) => {
     setArchivoCSV(data);
@@ -33,25 +34,23 @@ const App = () => {
     setArchivoCSVtest(data);
   };
 
-  function botonTestear(data){
-    if(!data) {
+  function botonTestear(data) {
+    if (!data) {
       swal({
-        text: 'Debes subir un archivo CSV de entrenamiento',
+        text: "Debes subir un archivo CSV de entrenamiento",
       });
     }
   }
 
-  function displayH(){
-    swal(
-      displayHelp()
-    );
+  function displayH() {
+    swal(displayHelp());
   }
 
   const papaparseOptions = {
     header: true,
     dynamicTyping: true,
     skipEmptyLines: true,
-    transformHeader: (header) => header.toLowerCase().replace(/\W/g, '_'),
+    transformHeader: (header) => header.toLowerCase().replace(/\W/g, "_"),
   };
   return (
     <>
@@ -65,7 +64,7 @@ const App = () => {
             <Grid item>
               <CSVReader
                 // cssClass={classes.input}
-                inputStyle={{ color: 'black' }}
+                inputStyle={{ color: "black" }}
                 onFileLoaded={handleForce}
                 parserOptions={papaparseOptions}
               />
@@ -78,7 +77,7 @@ const App = () => {
             <Grid item>
               <CSVReader
                 // cssClass={classes.input}
-                inputStyle={{ color: 'black' }}
+                inputStyle={{ color: "black" }}
                 onFileLoaded={handleForce2}
                 parserOptions={papaparseOptions}
               />
@@ -103,107 +102,118 @@ const App = () => {
             </Grid>
           </Grid>
           <Box pt={6}>
-            <BotonCargar archivoCSV={archivoCSV} umbral={umbral} setPage1={setPage1}/>
+            <BotonCargar archivoCSV={archivoCSV} umbral={umbral} setPage1={setPage1} />
           </Box>
           <Footer />
         </Container>
       ) : (
         <>
-          <Box py={2} px={'10vw'} display="flex" justifyContent="center">
+          <Box py={2} px={"10vw"} display="flex" justifyContent="center">
             <Typography variant="h4">Análisis Comparativo - Árboles de decisión</Typography>
           </Box>
-          <Box pb={2} px={'10vw'} display="flex" justifyContent="center">
-          <Box px={2}>
+          <Box pb={2} px={"10vw"} display="flex" justifyContent="center">
+            <Box px={2}>
               <Button
-                style={{ backgroundColor: '#C0D4F0' }}
+                style={{ backgroundColor: "#C0D4F0" }}
                 variant="contained"
                 onClick={() => {
                   displayH();
-                }}>
+                }}
+              >
                 Ayuda
               </Button>
             </Box>
             <Box px={2}>
               <Button
-                style={{ backgroundColor: '#C0D4F0' }}
+                style={{ backgroundColor: "#C0D4F0" }}
                 variant="contained"
                 onClick={() => {
                   setPage1(true);
                   setArchivoCSV(null);
                   setArchivoCSVtest(null);
                   setUmbral(0);
-                }}>
+                }}
+              >
                 Regresar al menú principal
               </Button>
             </Box>
             <Box px={2}>
               <Button
-                style={{ backgroundColor: (viewTree1 && viewTree2) ? '#C0D4F0' : viewTree1 ? '#F0CCE3' : '#C0D4F0' }}
+                style={{
+                  backgroundColor: viewTree1 && viewTree2 ? "#C0D4F0" : viewTree1 ? "#F0CCE3" : "#C0D4F0",
+                }}
                 variant="contained"
                 onClick={() => {
                   setViewTree1(true);
                   setViewTree2(false);
                   setSeeTwoTrees(12);
-                  setWidthTrees('100vw');
-                }}>
+                  setWidthTrees("100vw");
+                }}
+              >
                 Árbol con Ganancia
               </Button>
             </Box>
             <Box px={2} align="center">
               <Button
-                style={{ backgroundColor: (viewTree1 && viewTree2) ? '#C0D4F0' : viewTree2 ? '#F0CCE3' : '#C0D4F0' }}
+                style={{
+                  backgroundColor: viewTree1 && viewTree2 ? "#C0D4F0" : viewTree2 ? "#F0CCE3" : "#C0D4F0",
+                }}
                 variant="contained"
                 onClick={() => {
                   setViewTree1(false);
                   setViewTree2(true);
                   setSeeTwoTrees(12);
-                  setWidthTrees('100vw');
-                }}>
+                  setWidthTrees("100vw");
+                }}
+              >
                 Árbol con Tasa Ganancia
               </Button>
             </Box>
             <Box px={2}>
               <Button
-                style={{ backgroundColor: (viewTree1 && viewTree2) ? '#F0CCE3' : '#C0D4F0' }}
+                style={{ backgroundColor: viewTree1 && viewTree2 ? "#F0CCE3" : "#C0D4F0" }}
                 variant="contained"
                 onClick={() => {
                   setViewTree1(true);
                   setViewTree2(true);
                   setSeeTwoTrees(6);
-                  setWidthTrees('50vw');
-                }}>
+                  setWidthTrees("50vw");
+                }}
+              >
                 Mostrar ambos
               </Button>
             </Box>
             <Box px={2}>
-            <Button
-                style={{ backgroundColor: '#C0D4F0' }}
+              <Button
+                style={{ backgroundColor: "#C0D4F0" }}
                 variant="contained"
-                onClick={()=> {
-                    setViewTree1(true);
-                    setViewTree2(true);
-                    setSeeTwoTrees(6);
-                    setWidthTrees('50vw');
-                    setArchivoCSVtest(null)
-                    botonTestear(archivoCSVtest)
-                  }}>
+                onClick={() => {
+                  setViewTree1(true);
+                  setViewTree2(true);
+                  setSeeTwoTrees(6);
+                  setWidthTrees("50vw");
+                  setArchivoCSVtest(null);
+                  botonTestear(archivoCSVtest);
+                }}
+              >
                 Testear
-              </Button> 
+              </Button>
             </Box>
             <Box px={2}>
-            <Button
-                style={{ backgroundColor: '#C0D4F0' }}
+              <Button
+                style={{ backgroundColor: "#C0D4F0" }}
                 variant="contained"
-                onClick={()=> {
-                    setViewTree1(true);
-                    setViewTree2(true);
-                    setSeeTwoTrees(6);
-                    setWidthTrees('50vw');
-                    setArchivoCSVtest(null)
-                    instanciar(archivoCSV)
-                  }}>
+                onClick={() => {
+                  setViewTree1(true);
+                  setViewTree2(true);
+                  setSeeTwoTrees(6);
+                  setWidthTrees("50vw");
+                  setArchivoCSVtest(null);
+                  instanciar(archivoCSV);
+                }}
+              >
                 Clasificar Nueva Instancia
-              </Button> 
+              </Button>
             </Box>
           </Box>
           <Grid container>
@@ -214,9 +224,10 @@ const App = () => {
                     Árbol con ganancia de Información
                   </Typography>
                   <DecisionTree
+                    csvTest={archivoCSVtest}
                     csv={archivoCSV}
                     umbral={umbral}
-                    height={'100vh'}
+                    height={"100vh"}
                     width={widthTrees}
                   />
                 </Box>
@@ -226,12 +237,7 @@ const App = () => {
               {viewTree2 && (
                 <Box align="center">
                   <Typography variant="h5">Árbol con Tasa de ganancia</Typography>
-                  <DecisionTreeTG
-                    csv={archivoCSV}
-                    umbral={umbral}
-                    height={'100vh'}
-                    width={widthTrees}
-                  />
+                  <DecisionTreeTG csv={archivoCSV} umbral={umbral} height={"100vh"} width={widthTrees} />
                 </Box>
               )}
             </Grid>

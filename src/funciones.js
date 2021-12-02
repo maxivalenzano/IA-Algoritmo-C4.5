@@ -1,8 +1,7 @@
-import { omit, maxBy } from 'lodash-es';
+import { omit, maxBy } from "lodash-es";
 // devuelve los titulos de la primer fila
 export const listadoTituloColumnas = (datos) => {
   return Object.keys(datos[0]);
-  console.log('🚀 ~ file: funciones.js ~ line 4 ~ returnObject.keys(datos[0]) ~ listadoTituloColumnas', listadoTituloColumnas);
 };
 
 // devuelve el nombre de la clase (ultima fila)
@@ -115,9 +114,7 @@ export const calculoEntropiaParcialPorValorAtributoPorValorClase = (atributo, ca
     );
 
     const result = clase.atributos.map((key) => {
-      const cantValorAtributo = atributoTotal.cant.find(
-        (value) => String(value.campo) === String(key.campo)
-      );
+      const cantValorAtributo = atributoTotal.cant.find((value) => String(value.campo) === String(key.campo));
       const campoAtributo = key.campo;
       const terminoEntropiaParcial =
         -1 * (key.cant / cantValorAtributo.cant) * log2(key.cant / cantValorAtributo.cant);
@@ -215,9 +212,7 @@ export const filterConjunto = (conjunto, clase) => {
 // busca en el atributo de mayor ganancia, toda la informacion respecto al valor de clase que le pasemos
 export const busquedaCampoClase = (gananciaMax, valor) => {
   const busqueda = gananciaMax.cantXClase.find((campoClase) =>
-    campoClase.entropias?.find(
-      (campoAtributo) => String(campoAtributo.campoAtributo) === String(valor.campo)
-    )
+    campoClase.entropias?.find((campoAtributo) => String(campoAtributo.campoAtributo) === String(valor.campo))
   );
   return busqueda.entropias.find((item) => String(item.campoAtributo) === String(valor.campo));
 };
@@ -234,9 +229,7 @@ export const filtradoSegunAtributoGananciaMaxima = (gananciaMax, dataSet, nombre
     // comparamos la ganancia o tasa de ganancia con el umbral ingresado
     if (gananciaMax.ganancia < umbral) {
       const valoresClasePorAtrib = gananciaMax.cantXClase.map((campoClase) => {
-        return (
-          campoClase.entropias.find((atributo) => atributo.campoAtributo === valor.campo) ?? {}
-        );
+        return campoClase.entropias.find((atributo) => atributo.campoAtributo === valor.campo) ?? {};
       });
       // buscamos el valor mas frecuente de clase por cada valor de atributo
       const maxValorClasePorAtrib = maxBy(valoresClasePorAtrib, function (item) {
@@ -258,12 +251,12 @@ export const filtradoSegunAtributoGananciaMaxima = (gananciaMax, dataSet, nombre
         nodoPuro: campoPuro,
       };
     }
-    // tratamiento por si la ganancia es mayor al umbral 
+    // tratamiento por si la ganancia es mayor al umbral
     const result = nuevoDataSetSinPuros.filter((item) => {
       return String(item[gananciaMax.atributo]) === String(valor.campo);
     });
 
-      // si el nuevo dataSet es vacio, lo clasifica como puro para ese valor de atributo
+    // si el nuevo dataSet es vacio, lo clasifica como puro para ese valor de atributo
     if (result.length === 0) {
       campoPuro = busquedaCampoClase(gananciaMax, valor);
     }
@@ -272,9 +265,7 @@ export const filtradoSegunAtributoGananciaMaxima = (gananciaMax, dataSet, nombre
     const filtrados = result.map((fila) => omit(fila, gananciaMax.atributo));
 
     // verificamos si la entropia del futuro conjunto a evaluar es 0, para resguardar informacion
-    const entropiaFuturoConjunto = calculoEntropíaConjunto(
-      listadoValoresColumna(filtrados, nombreClase)
-    );
+    const entropiaFuturoConjunto = calculoEntropíaConjunto(listadoValoresColumna(filtrados, nombreClase));
     if (entropiaFuturoConjunto === 0) {
       campoPuro = busquedaCampoClase(gananciaMax, valor);
     }
@@ -293,15 +284,15 @@ export const calculoEntropiaIndividual = (claseNombre, dataSet) => {
   const columnas = listadoTituloColumnas(dataSet);
   const listaAtributos = columnas.filter((item) => item !== claseNombre);
   // de esta variable
-  const listadoAtributosSeparadosPorClase = listadoDeAtributosSeparadosPorColumna(
-    claseNombre,
-    dataSet
-  );
+  const listadoAtributosSeparadosPorClase = listadoDeAtributosSeparadosPorColumna(claseNombre, dataSet);
 
   const cantValorPorAtributoConst = cantValorPorAtributo(listaAtributos, dataSet);
 
   const calculosEntropíaIndividual = listadoAtributosSeparadosPorClase.map((atributo) => {
-    const calculosPorClase = calculoEntropiaParcialPorValorAtributoPorValorClase(atributo, cantValorPorAtributoConst);
+    const calculosPorClase = calculoEntropiaParcialPorValorAtributoPorValorClase(
+      atributo,
+      cantValorPorAtributoConst
+    );
     const entropiaTotal = sumaEntropía(calculosPorClase);
     return {
       atributo: atributo.atributo,
@@ -321,9 +312,7 @@ export const calcularEntropiaTotalXAtributo = (nombreClase, dataSet) => {
 
   const entropiaTotalAtributos = calculosEntropíaIndividual.map((item) => {
     const result = item.entropiasTotales.map((value) => {
-      const cantValorAtributo = item.cantAtributos.find(
-        (key) => String(key.campo) === String(value.campo)
-      );
+      const cantValorAtributo = item.cantAtributos.find((key) => String(key.campo) === String(value.campo));
       const entropy = (cantValorAtributo.cant / listadoValoresClases.length) * value.entropia;
       return {
         campo: value.campo,
@@ -363,10 +352,7 @@ export const expansionAlgoritmo = (dataSet, umbral) => {
     return [];
   }
   const entropiaTotalAtributos = calcularEntropiaTotalXAtributo(clase.nombre, dataSet);
-  const calculoGananciaInform = calculoGananciaInformacion(
-    entropiaTotalAtributos,
-    entropiaConjunto
-  );
+  const calculoGananciaInform = calculoGananciaInformacion(entropiaTotalAtributos, entropiaConjunto);
   const gananciaMaxima = maximoGanancia(calculoGananciaInform);
   const dataSetForExpansion = filtradoSegunAtributoGananciaMaxima(
     gananciaMaxima,
@@ -379,14 +365,14 @@ export const expansionAlgoritmo = (dataSet, umbral) => {
     return {
       gananciaMax: rama.gananciaMax,
       valorAtributo: rama.valorAtributo,
-      nodoPuro: {clase: clase.nombre, nodoPuro: rama.nodoPuro},
+      nodoPuro: { clase: clase.nombre, nodoPuro: rama.nodoPuro },
       nodo: gananciaMaxima.atributo,
       ramas: expansionAlgoritmo(rama.filas, umbral),
     };
   });
 };
 
-  // funcion recursiva utilizando la Tasa de Ganancia
+// funcion recursiva utilizando la Tasa de Ganancia
 export const expansionAlgoritmoConTG = (dataSet, umbral) => {
   // caso base
   if (dataSet.length === 0) {
@@ -404,10 +390,7 @@ export const expansionAlgoritmoConTG = (dataSet, umbral) => {
     return [];
   }
   const entropiaTotalAtributos = calcularEntropiaTotalXAtributo(clase.nombre, dataSet);
-  const calculoTasaGanancia = calculoTasaGananciaInformacion(
-    entropiaTotalAtributos,
-    entropiaConjunto
-  );
+  const calculoTasaGanancia = calculoTasaGananciaInformacion(entropiaTotalAtributos, entropiaConjunto);
   const gananciaMaxima = maximoGanancia(calculoTasaGanancia);
   const dataSetForExpansion = filtradoSegunAtributoGananciaMaxima(
     gananciaMaxima,
@@ -420,7 +403,7 @@ export const expansionAlgoritmoConTG = (dataSet, umbral) => {
     return {
       gananciaMax: rama.gananciaMax,
       valorAtributo: rama.valorAtributo,
-      nodoPuro: {clase: clase.nombre, nodoPuro: rama.nodoPuro},
+      nodoPuro: { clase: clase.nombre, nodoPuro: rama.nodoPuro },
       nodo: gananciaMaxima.atributo,
       ramas: expansionAlgoritmoConTG(rama.filas, umbral),
     };
@@ -437,7 +420,7 @@ export const auxFormateoDatos = (datos) => {
       ? `Nodo: ${nodo.ramas[0]?.nodo}`
       : nodo.nodoPuro?.nodoPuro?.campoClase
       ? `${nodo.nodoPuro.clase}: ${nodo.nodoPuro.nodoPuro?.campoClase}`
-      : 'NodoImpuro';
+      : "NodoImpuro";
     return nodo.ramas.length === 0
       ? {
           name: nameNodo,
@@ -445,7 +428,7 @@ export const auxFormateoDatos = (datos) => {
           anterior: nodo.gananciaMax,
           attributes: {
             atributo: nodo.valorAtributo.campo,
-            entropy: nodo.valorAtributo.entropia
+            entropy: nodo.valorAtributo.entropia,
           },
         }
       : {
@@ -454,7 +437,7 @@ export const auxFormateoDatos = (datos) => {
           anterior: nodo.gananciaMax,
           attributes: {
             atributo: nodo.valorAtributo.campo,
-            entropy: nodo.valorAtributo.entropia
+            entropy: nodo.valorAtributo.entropia,
           },
           children: auxFormateoDatos(nodo.ramas),
         };
@@ -474,7 +457,7 @@ export const formatearDatos = (datos) => {
         ? `Nodo: ${nodo.ramas[0]?.nodo}`
         : nodo.nodoPuro?.nodoPuro?.campoClase
         ? `${nodo.nodoPuro.clase}: ${nodo.nodoPuro.nodoPuro?.campoClase}`
-        : 'NodoImpuro';
+        : "NodoImpuro";
       return nodo.ramas.length === 0
         ? {
             name: nameNodo,
@@ -482,7 +465,7 @@ export const formatearDatos = (datos) => {
             anterior: nodo.gananciaMax,
             attributes: {
               atributo: nodo.valorAtributo.campo,
-              entropy: nodo.valorAtributo.entropia
+              entropy: nodo.valorAtributo.entropia,
             },
           }
         : {
@@ -491,18 +474,120 @@ export const formatearDatos = (datos) => {
             anterior: nodo.gananciaMax,
             attributes: {
               atributo: nodo.valorAtributo.campo,
-              entropy: nodo.valorAtributo.entropia
+              entropy: nodo.valorAtributo.entropia,
             },
             children: auxFormateoDatos(nodo.ramas),
           };
     }),
   };
 };
+let caminosPosibles = [];
 
+export const formatearDatosTest = (datos) => {
+  if (datos.length === 0) {
+    return [];
+  }
+  return {
+    name: datos[0].nodo,
+    children: datos.map((nodo) => {
+      const attributeName = nodo.nodo;
+      const nameNodo = nodo.ramas[0]?.nodo
+        ? nodo.ramas[0]?.nodo
+        : nodo.nodoPuro?.nodoPuro?.campoClase
+        ? nodo.nodoPuro.nodoPuro?.campoClase
+        : "NodoImpuro";
+      nodo.ramas.length === 0 &&
+        nameNodo !== "NodoImpuro" &&
+        caminosPosibles.push({ [attributeName]: nodo.valorAtributo.campo, [nodo.nodoPuro.clase]: nameNodo });
+      return nodo.ramas.length === 0
+        ? {
+            name: nameNodo,
+            attributes: nodo.valorAtributo.campo,
+            obj: { [attributeName]: nodo.valorAtributo.campo, [nodo.nodoPuro.clase]: nameNodo },
+          }
+        : {
+            name: nameNodo,
+            attributes: nodo.valorAtributo.campo,
+            obj: { [attributeName]: nodo.valorAtributo.campo },
+            children: auxFormateoDatosTest({
+              datos: nodo.ramas,
+              obj: { [attributeName]: nodo.valorAtributo.campo },
+            }),
+          };
+    }),
+  };
+};
+
+export const auxFormateoDatosTest = (datos) => {
+  if (datos.datos.length === 0) {
+    return [];
+  }
+  return datos.datos.map((nodo) => {
+    const attributeName = nodo.nodo;
+    const nameNodo = nodo.ramas[0]?.nodo
+      ? nodo.ramas[0]?.nodo
+      : nodo.nodoPuro?.nodoPuro?.campoClase
+      ? nodo.nodoPuro.nodoPuro?.campoClase
+      : "NodoImpuro";
+    nodo.ramas.length === 0 &&
+      nameNodo !== "NodoImpuro" &&
+      caminosPosibles.push({
+        ...datos.obj,
+        [attributeName]: nodo.valorAtributo.campo,
+        [nodo.nodoPuro.clase]: nameNodo,
+      });
+    return nodo.ramas.length === 0
+      ? {
+          name: nameNodo,
+          attributes: nodo.valorAtributo.campo,
+          obj: { ...datos.obj, [attributeName]: nodo.valorAtributo.campo, [nodo.nodoPuro.clase]: nameNodo },
+        }
+      : {
+          name: nameNodo,
+          attributes: nodo.valorAtributo.campo,
+          obj: { ...datos.obj, [attributeName]: nodo.valorAtributo.campo },
+          children: auxFormateoDatosTest({
+            datos: nodo.ramas,
+            obj: { ...datos.obj, [attributeName]: nodo.valorAtributo.campo },
+          }),
+        };
+  });
+};
+export const testearFilas = (caminosPosibles, dataSet) => {
+  const result = dataSet.map((row) => {
+    const result2 = caminosPosibles.map((camino) => {
+      const result3 = Object.entries(camino).map(([key, value]) => {
+        return String(row[key]) === String(value);
+      });
+      return !result3.includes(false);
+    });
+    console.log(
+      "🚀 ~ file: funciones.js ~ line 562 ~ result2 ~ result2",
+      result2,
+      result2.includes(true),
+      row
+    );
+    return result2.includes(true);
+  });
+  console.log("🚀 ~ file: funciones.js ~ line 558 ~ testearFilas ~ result", result);
+  return result;
+};
 // funcion que combina el algoritmo de expansion y el formateo de salida
-export const calcularC45 = (dataSet, umbral) => {
-  const data = expansionAlgoritmo(dataSet, umbral);
-  return formatearDatos(data);
+export const calcularC45 = (dataSet, umbral, csvTest) => {
+  console.log("🚀 ~ file: funciones.js ~ line 557 ~ calcularC45 ~ csvTest", csvTest);
+  const data = formatearDatos(expansionAlgoritmo(dataSet, umbral));
+  formatearDatosTest(expansionAlgoritmo(dataSet, umbral));
+  const testRows = cantidadApariciones(testearFilas(caminosPosibles, csvTest));
+  const aciertos = testRows.find((item) => item.campo === "true");
+  const calculo = `${(aciertos.cant / csvTest.length) * 100}%`;
+  const calculoErrores = `${100 - (aciertos.cant / csvTest.length) * 100}%`;
+  return {
+    graph: data,
+    caminosPosibles: caminosPosibles,
+    testRows,
+    portentajeAciertos: calculo,
+    portentajeIncorrectos: calculoErrores,
+  };
 };
 
 // funcion que combina el algoritmo de expansion y el formateo de salida
