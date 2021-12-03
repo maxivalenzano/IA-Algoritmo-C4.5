@@ -1,4 +1,4 @@
-import { omit, maxBy } from "lodash-es";
+import { omit, maxBy, difference } from "lodash-es";
 // devuelve los titulos de la primer fila
 export const listadoTituloColumnas = (datos) => {
   return Object.keys(datos[0]);
@@ -482,6 +482,9 @@ export const formatearDatos = (datos) => {
   };
 };
 let caminosPosibles = [];
+let noClasifican = [];
+let correctos = [];
+let fallidos = [];
 
 export const formatearDatosTest = (datos) => {
   if (datos.length === 0) {
@@ -496,9 +499,21 @@ export const formatearDatosTest = (datos) => {
         : nodo.nodoPuro?.nodoPuro?.campoClase
         ? nodo.nodoPuro.nodoPuro?.campoClase
         : "NodoImpuro";
-      nodo.ramas.length === 0 &&
-        nameNodo !== "NodoImpuro" &&
-        caminosPosibles.push({ [attributeName]: nodo.valorAtributo.campo, [nodo.nodoPuro.clase]: nameNodo });
+        if (nodo.ramas.length === 0) {
+          if (nameNodo !== 'NodoImpuro') {
+            caminosPosibles.push({
+              ...datos.obj,
+              [attributeName]: nodo.valorAtributo.campo,
+              [nodo.nodoPuro.clase]: nameNodo,
+            });
+          } else {
+            caminosPosibles.push({
+              ...datos.obj,
+              [attributeName]: nodo.valorAtributo.campo,
+              [nodo.nodoPuro.clase]: nameNodo,
+            });
+          }
+        }
       return nodo.ramas.length === 0
         ? {
             name: nameNodo,
@@ -529,13 +544,21 @@ export const auxFormateoDatosTest = (datos) => {
       : nodo.nodoPuro?.nodoPuro?.campoClase
       ? nodo.nodoPuro.nodoPuro?.campoClase
       : "NodoImpuro";
-    nodo.ramas.length === 0 &&
-      nameNodo !== "NodoImpuro" &&
-      caminosPosibles.push({
-        ...datos.obj,
-        [attributeName]: nodo.valorAtributo.campo,
-        [nodo.nodoPuro.clase]: nameNodo,
-      });
+      if (nodo.ramas.length === 0) {
+        if (nameNodo !== 'NodoImpuro') {
+          caminosPosibles.push({
+            ...datos.obj,
+            [attributeName]: nodo.valorAtributo.campo,
+            [nodo.nodoPuro.clase]: nameNodo,
+          });
+        } else {
+          caminosPosibles.push({
+            ...datos.obj,
+            [attributeName]: nodo.valorAtributo.campo,
+            [nodo.nodoPuro.clase]: nameNodo,
+          });
+        }
+      }
     return nodo.ramas.length === 0
       ? {
           name: nameNodo,
@@ -556,37 +579,70 @@ export const auxFormateoDatosTest = (datos) => {
 export const testearFilas = (caminosPosibles, dataSet) => {
   const result = dataSet.map((row) => {
     const result2 = caminosPosibles.map((camino) => {
+      let bandera = true;
+      let incorrecto = false;
+      let count = 0;
+      const largo = Object.entries(camino).length;
       const result3 = Object.entries(camino).map(([key, value]) => {
+        // value === 'NodoImpuro' && console.log('🚀 ~ file: funciones.js ~ line 585 ~ result3', (count), largo)
+        if (value === 'NodoImpuro' && ((count+1) === largo)) {
+          // console.log('🚀 ~ file: funciones.js ~ line 584', value, String(row[key]));
+          incorrecto = true;
+        }
+        bandera = (String(row[key]) === String(value));
+        bandera && count ++;
         return String(row[key]) === String(value);
       });
+      // console.log('🚀 ~ file: funciones.js ~ line 594 ~ result3 ~ result3', result3);
+      if (incorrecto) {
+        console.log('🚀 ~🚀 ~🚀 ~🚀 ~🚀 ~🚀 ~🚀 ~🚀 ~🚀 ~', {
+        validaciones: result3,
+        posibleIncorrecto: row,
+        camino: camino,
+      });
+      noClasifican.push(row)
+    } 
       return !result3.includes(false);
     });
     console.log(
       "🚀 ~ file: funciones.js ~ line 562 ~ result2 ~ result2",
-      result2,
-      result2.includes(true),
-      row
+      {result2,
+      valor: result2.includes(true),
+      row}
     );
+    if (result2.includes(true)) {
+      correctos.push(row)
+    } else {fallidos.push(row)}
     return result2.includes(true);
   });
   console.log("🚀 ~ file: funciones.js ~ line 558 ~ testearFilas ~ result", result);
   return result;
 };
 // funcion que combina el algoritmo de expansion y el formateo de salida
-export const calcularC45 = (dataSet, umbral, csvTest) => {
-  console.log("🚀 ~ file: funciones.js ~ line 557 ~ calcularC45 ~ csvTest", csvTest);
+export const calcularC45 = (dataSet, umbral, csvTest = []) => {
+  caminosPosibles = [];
+  noClasifican = [];
+  correctos = [];
+  fallidos = [];
+  console.log('🚀 ~ file: funciones.js ~ line 557 ~ calcularC45 ~ csvTest', csvTest);
   const data = formatearDatos(expansionAlgoritmo(dataSet, umbral));
   formatearDatosTest(expansionAlgoritmo(dataSet, umbral));
   const testRows = cantidadApariciones(testearFilas(caminosPosibles, csvTest));
-  const aciertos = testRows.find((item) => item.campo === "true");
+  const aciertos = testRows.find((item) => item.campo === 'true');
+  const noAciertos = testRows.find((item) => item.campo === 'false');
   const calculo = `${(aciertos.cant / csvTest.length) * 100}%`;
-  const calculoErrores = `${100 - (aciertos.cant / csvTest.length) * 100}%`;
+  const calculoErrores = `${((noAciertos.cant - noClasifican.length) / csvTest.length) * 100}%`;
+  const calculoSinClasificar = `${(noClasifican.length / csvTest.length) * 100}%`;
+  const diferencia = difference(fallidos, noClasifican);
+  console.log('🚀 ~ file: funciones.js ~ line 635 ~ calcularC45 ~ diferencia', diferencia);
   return {
     graph: data,
     caminosPosibles: caminosPosibles,
     testRows,
     portentajeAciertos: calculo,
     portentajeIncorrectos: calculoErrores,
+    portentajeSinClasificar: calculoSinClasificar,
+    row: { incorrectos: diferencia, aciertos: correctos, noClasifican },
   };
 };
 

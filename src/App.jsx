@@ -7,7 +7,8 @@ import { Box, Container, Button, Typography, Grid } from "@material-ui/core";
 import swal from "@sweetalert/with-react";
 import { instanciar, displayHelp } from "./funcionesInstanciar";
 import "./styles.css";
-import conjuntoEntrenamiento2 from "./conjuntoEntrenamiento2";
+import conjuntoEntrenamiento2 from "./conjuntoEntrenamiento4";
+import conjuntoTest from "./conjuntoTest";
 
 //Crea el footer de la página principal
 const Footer = () => (
@@ -18,7 +19,7 @@ const Footer = () => (
 
 const App = () => {
   const [archivoCSV, setArchivoCSV] = useState(conjuntoEntrenamiento2);
-  const [archivoCSVtest, setArchivoCSVtest] = useState(conjuntoEntrenamiento2);
+  const [archivoCSVtest, setArchivoCSVtest] = useState(conjuntoTest);
   const [umbral, setUmbral] = useState(0);
   const [page1, setPage1] = useState(true);
   const [viewTree1, setViewTree1] = useState(true);
