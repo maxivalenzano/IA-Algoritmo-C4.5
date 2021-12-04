@@ -6,7 +6,7 @@ import { useCenteredTree, renderRectSvgNode } from "./useCenteredTree";
 import swal from "@sweetalert/with-react";
 import "./styles.css";
 
-const DecisionTree = ({ csv, umbral = 0, height, width, csvTest }) => {
+const DecisionTree = ({ csv, umbral = 0, height, width, csvTest, setResultados }) => {
   const containerStyles = {
     width: width,
     height: height,
@@ -15,7 +15,8 @@ const DecisionTree = ({ csv, umbral = 0, height, width, csvTest }) => {
   const [jsonValuesC45, setJsonValuesC45] = useState({ test: {}, graph: {} });
   console.log("🚀 ~ file: DecisionTree.jsx ~ line 16 ~ DecisionTree ~ jsonValuesC45", jsonValuesC45);
   useEffect(() => {
-    setJsonValuesC45(calcularC45(csv, umbral, csvTest));
+    setJsonValuesC45(calcularC45(csv, umbral, csvTest, setResultados));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [csv, umbral, csvTest]);
 
   const handleNodeClick = (nodeDatum) => {
