@@ -4,6 +4,20 @@ export const listadoTituloColumnas = (datos) => {
   return Object.keys(datos[0]);
 };
 
+export const formatColumns = (titles) => {
+  let result = titles.map((column) => {
+    return { field: column, title: column, sorting: true, }
+  })
+  result.push({ field: 'id', title: 'id', hidden: true })
+  return result
+}
+
+export const formatedRow = (csv) => {
+  return csv.map((item, index) => {
+    return {...item, id: index}
+  })
+}
+
 // devuelve el nombre de la clase (ultima fila)
 export const posicionClase = (datos) => {
   const columnas = listadoTituloColumnas(datos);
@@ -620,66 +634,78 @@ export const testearFilas = (caminosPosibles, dataSet) => {
 };
 // funcion que combina el algoritmo de expansion y el formateo de salida
 export const calcularC45 = (dataSet, umbral, csvTest = [], setResultados) => {
+  const data = formatearDatos(expansionAlgoritmo(dataSet, umbral));
   caminosPosibles = [];
   noClasifican = [];
   correctos = [];
   fallidos = [];
-  console.log('🚀 ~ file: funciones.js ~ line 557 ~ calcularC45 ~ csvTest', csvTest);
-  const data = formatearDatos(expansionAlgoritmo(dataSet, umbral));
-  formatearDatosTest(expansionAlgoritmo(dataSet, umbral));
-  const testRows = cantidadApariciones(testearFilas(caminosPosibles, csvTest));
-  const aciertos = testRows.find((item) => item.campo === 'true');
-  const noAciertos = testRows.find((item) => item.campo === 'false');
-  const calculo = `${(aciertos?.cant / csvTest.length) * 100}%`;
-  const calculoErrores = `${(((noAciertos?.cant || 0) - noClasifican.length) / csvTest.length) * 100}%`;
-  const calculoSinClasificar = `${(noClasifican.length / csvTest.length) * 100}%`;
-  const diferencia = difference(fallidos, noClasifican);
-  setResultados([
-    ['Resultados', 'Cantidades'],
-    ['Correctos', aciertos?.cant],
-    ['Incorrectos', ((noAciertos?.cant || 0) - noClasifican.length)],
-    ['Sin clasificar', noClasifican?.length],
-  ])
-  return {
-    graph: data,
-    caminosPosibles: caminosPosibles,
-    testRows,
-    portentajeAciertos: calculo,
-    portentajeIncorrectos: calculoErrores,
-    portentajeSinClasificar: calculoSinClasificar,
-    row: { incorrectos: diferencia, aciertos: correctos, noClasifican },
-  };
+  if (csvTest) {
+    console.log('🚀 ~ file: funciones.js ~ line 557 ~ calcularC45 ~ csvTest', csvTest);
+    formatearDatosTest(expansionAlgoritmo(dataSet, umbral));
+    const testRows = cantidadApariciones(testearFilas(caminosPosibles, csvTest));
+    const aciertos = testRows.find((item) => item.campo === 'true');
+    const noAciertos = testRows.find((item) => item.campo === 'false');
+    const calculo = `${(aciertos?.cant / csvTest.length) * 100}%`;
+    const calculoErrores = `${
+      (((noAciertos?.cant || 0) - noClasifican.length) / csvTest.length) * 100
+    }%`;
+    const calculoSinClasificar = `${(noClasifican.length / csvTest.length) * 100}%`;
+    const diferencia = difference(fallidos, noClasifican);
+    setResultados([
+      ['Resultados', 'Cantidades'],
+      ['Correctos', aciertos?.cant],
+      ['Incorrectos', (noAciertos?.cant || 0) - noClasifican.length],
+      ['Sin clasificar', noClasifican?.length],
+    ]);
+    return {
+      graph: data,
+      caminosPosibles: caminosPosibles,
+      testRows,
+      portentajeAciertos: calculo,
+      portentajeIncorrectos: calculoErrores,
+      portentajeSinClasificar: calculoSinClasificar,
+      row: { incorrectos: diferencia, aciertos: correctos, noClasifican },
+    };
+  } else {
+    return { graph: data };
+  }
 };
 
 // funcion que combina el algoritmo de expansion y el formateo de salida
 export const calcularC45_TG = (dataSet, umbral, csvTest = [], setResultadosTG) => {
-console.log('🚀 ~ file: funciones.js ~ line 651 ~ csvTest', csvTest);
+  const data = formatearDatos(expansionAlgoritmoConTG(dataSet, umbral));
   caminosPosibles = [];
   noClasifican = [];
   correctos = [];
   fallidos = [];
-  const data = formatearDatos(expansionAlgoritmoConTG(dataSet, umbral));
-  formatearDatosTest(expansionAlgoritmo(dataSet, umbral));
-  const testRows = cantidadApariciones(testearFilas(caminosPosibles, csvTest));
-  const aciertos = testRows.find((item) => item.campo === 'true');
-  const noAciertos = testRows.find((item) => item.campo === 'false');
-  const calculo = `${(aciertos?.cant / csvTest.length) * 100}%`;
-  const calculoErrores = `${(((noAciertos?.cant || 0) - noClasifican.length) / csvTest.length) * 100}%`;
-  const calculoSinClasificar = `${(noClasifican.length / csvTest.length) * 100}%`;
-  const diferencia = difference(fallidos, noClasifican);
-  setResultadosTG([
-    ['Resultados', 'Cantidades'],
-    ['Correctos', aciertos?.cant],
-    ['Incorrectos', ((noAciertos?.cant || 0) - noClasifican.length)],
-    ['Sin clasificar', noClasifican?.length],
-  ])
-  return {
-    graph: data,
-    caminosPosibles: caminosPosibles,
-    testRows,
-    portentajeAciertos: calculo,
-    portentajeIncorrectos: calculoErrores,
-    portentajeSinClasificar: calculoSinClasificar,
-    row: { incorrectos: diferencia, aciertos: correctos, noClasifican },
-  };
+  if (csvTest) {
+    console.log('🚀 ~ file: funciones.js ~ line 651 ~ csvTest', csvTest);
+    formatearDatosTest(expansionAlgoritmo(dataSet, umbral));
+    const testRows = cantidadApariciones(testearFilas(caminosPosibles, csvTest));
+    const aciertos = testRows.find((item) => item.campo === 'true');
+    const noAciertos = testRows.find((item) => item.campo === 'false');
+    const calculo = `${(aciertos?.cant / csvTest.length) * 100}%`;
+    const calculoErrores = `${
+      (((noAciertos?.cant || 0) - noClasifican.length) / csvTest.length) * 100
+    }%`;
+    const calculoSinClasificar = `${(noClasifican.length / csvTest.length) * 100}%`;
+    const diferencia = difference(fallidos, noClasifican);
+    setResultadosTG([
+      ['Resultados', 'Cantidades'],
+      ['Correctos', aciertos?.cant],
+      ['Incorrectos', (noAciertos?.cant || 0) - noClasifican.length],
+      ['Sin clasificar', noClasifican?.length],
+    ]);
+    return {
+      graph: data,
+      caminosPosibles: caminosPosibles,
+      testRows,
+      portentajeAciertos: calculo,
+      portentajeIncorrectos: calculoErrores,
+      portentajeSinClasificar: calculoSinClasificar,
+      row: { incorrectos: diferencia, aciertos: correctos, noClasifican },
+    };
+  } else {
+    return { graph: data };
+  }
 };

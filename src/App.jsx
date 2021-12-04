@@ -4,20 +4,68 @@ import { Chart } from 'react-google-charts';
 import BotonCargar from './boton';
 import DecisionTree from './DecisionTree';
 import DecisionTreeTG from './DecisionTreeTG';
-import { Box, Container, Button, Typography, Grid, DialogContent, makeStyles, Dialog } from '@material-ui/core';
+import {
+  Box,
+  Container,
+  Button,
+  Typography,
+  Grid,
+  DialogContent,
+  makeStyles,
+  Dialog,
+} from '@material-ui/core';
 import CloseIcon from './CloseIcon';
 import swal from '@sweetalert/with-react';
 import { instanciar, displayHelp } from './funcionesInstanciar';
 import './styles.css';
 import conjuntoEntrenamiento2 from './conjuntoEntrenamiento4';
 import conjuntoTest from './conjuntoTest';
+import { listadoTituloColumnas, formatColumns, formatedRow } from './funciones';
+
+import MaterialTable from 'material-table';
+import { forwardRef } from 'react';
+import AddBox from '@material-ui/icons/AddBox';
+import ArrowDownward from '@material-ui/icons/ArrowDownward';
+import Check from '@material-ui/icons/Check';
+import ChevronLeft from '@material-ui/icons/ChevronLeft';
+import ChevronRight from '@material-ui/icons/ChevronRight';
+import Clear from '@material-ui/icons/Clear';
+import DeleteOutline from '@material-ui/icons/DeleteOutline';
+import Edit from '@material-ui/icons/Edit';
+import FilterList from '@material-ui/icons/FilterList';
+import FirstPage from '@material-ui/icons/FirstPage';
+import LastPage from '@material-ui/icons/LastPage';
+import Remove from '@material-ui/icons/Remove';
+import SaveAlt from '@material-ui/icons/SaveAlt';
+import Search from '@material-ui/icons/Search';
+import ViewColumn from '@material-ui/icons/ViewColumn';
+
+const tableIcons = {
+  Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
+  Check: forwardRef((props, ref) => <Check {...props} ref={ref} />),
+  Clear: forwardRef((props, ref) => <Clear {...props} ref={ref} />),
+  Delete: forwardRef((props, ref) => <DeleteOutline {...props} ref={ref} />),
+  DetailPanel: forwardRef((props, ref) => <ChevronRight {...props} ref={ref} />),
+  Edit: forwardRef((props, ref) => <Edit {...props} ref={ref} />),
+  Export: forwardRef((props, ref) => <SaveAlt {...props} ref={ref} />),
+  Filter: forwardRef((props, ref) => <FilterList {...props} ref={ref} />),
+  FirstPage: forwardRef((props, ref) => <FirstPage {...props} ref={ref} />),
+  LastPage: forwardRef((props, ref) => <LastPage {...props} ref={ref} />),
+  NextPage: forwardRef((props, ref) => <ChevronRight {...props} ref={ref} />),
+  PreviousPage: forwardRef((props, ref) => <ChevronLeft {...props} ref={ref} />),
+  ResetSearch: forwardRef((props, ref) => <Clear {...props} ref={ref} />),
+  Search: forwardRef((props, ref) => <Search {...props} ref={ref} />),
+  SortArrow: forwardRef((props, ref) => <ArrowDownward {...props} ref={ref} />),
+  ThirdStateCheck: forwardRef((props, ref) => <Remove {...props} ref={ref} />),
+  ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />),
+};
 
 //Crea el footer de la página principal
-const Footer = () => (
-  <footer className="footer">
-    <p>Inteligencia Artificial - Grupo 10</p>
-  </footer>
-);
+// const Footer = () => (
+//   <footer className="footer">
+//     <p>Inteligencia Artificial - Grupo 10</p>
+//   </footer>
+// );
 
 const useStyles = makeStyles(() => ({
   closeIcon: {
@@ -31,6 +79,12 @@ const App = () => {
   const classes = useStyles();
   const [archivoCSV, setArchivoCSV] = useState(conjuntoEntrenamiento2);
   const [archivoCSVtest, setArchivoCSVtest] = useState(conjuntoTest);
+  const titleColumns = archivoCSV ? listadoTituloColumnas(archivoCSV) : [];
+  const rows = archivoCSV ? formatedRow(archivoCSV) : [];
+  const rowsTest = archivoCSVtest ? formatedRow(archivoCSVtest) : [];
+  const columns = formatColumns(titleColumns);
+  console.log('🚀 ~ file: App.jsx ~ line 42 ~ App ~ rows', rows);
+  console.log('🚀 ~ file: App.jsx ~ line 44 ~ App ~ columns', columns);
   const [umbral, setUmbral] = useState(0);
   const [page1, setPage1] = useState(true);
   const [viewTree1, setViewTree1] = useState(true);
@@ -40,29 +94,30 @@ const App = () => {
   const [resultados, setResultados] = useState([]);
   const [resultadosTG, setResultadosTG] = useState([]);
   const [openModal, setOpenModal] = useState(false);
+  const [openModalGrid, setOpenModalGrid] = useState(false);
+  const [openModalTest, setOpenModalTest] = useState(false);
+  const [openModalHelp, setOpenModalHelp] = useState(false);
 
+  function toggleModalHelp() {
+    setOpenModalHelp(!openModalHelp);
+  }
+  function toggleModalTest() {
+    setOpenModalTest(!openModalTest);
+  }
   function toggleModal() {
     setOpenModal(!openModal);
   }
-
+  function toggleModalGrid() {
+    setOpenModalGrid(!openModalGrid);
+  }
   const handleForce = (data, fileInfo) => {
     setArchivoCSV(data);
   };
-
   const handleForce2 = (data, fileInfo) => {
     setArchivoCSVtest(data);
   };
-
-  function botonTestear(data) {
-    if (!data) {
-      swal({
-        text: 'Debes subir un archivo CSV de entrenamiento',
-      });
-    }
-  }
-
   function displayH() {
-    swal(displayHelp());
+    toggleModalHelp()
   }
 
   const papaparseOptions = {
@@ -95,7 +150,6 @@ const App = () => {
             </Grid>
             <Grid item>
               <CSVReader
-                // cssClass={classes.input}
                 inputStyle={{ color: 'black' }}
                 onFileLoaded={handleForce2}
                 parserOptions={papaparseOptions}
@@ -120,10 +174,103 @@ const App = () => {
               />
             </Grid>
           </Grid>
-          <Box pt={6}>
-            <BotonCargar archivoCSV={archivoCSV} umbral={umbral} setPage1={setPage1} />
+          <Box pt={6} pb={2} display="flex" justifyContent="center">
+            <Box px={2}>
+              <BotonCargar archivoCSV={archivoCSV} umbral={umbral} setPage1={setPage1} />
+            </Box>
+            <Box px={2} align="center">
+              <Button
+                disabled={!archivoCSV}
+                style={{ backgroundColor: openModalGrid ? '#F0CCE3' : '#C0D4F0' }}
+                variant="contained"
+                onClick={toggleModalGrid}>
+                Previsualizar Training
+              </Button>
+            </Box>
+            <Box px={2} align="center">
+              <Button
+                disabled={!archivoCSVtest}
+                style={{ backgroundColor: openModalTest ? '#F0CCE3' : '#C0D4F0' }}
+                variant="contained"
+                onClick={toggleModalTest}>
+                Previsualizar Test
+              </Button>
+            </Box>
           </Box>
-          <Footer />
+          {openModalGrid && (
+            <Box py={3} style={{ maxWidth: '100%' }}>
+              <MaterialTable
+                icons={tableIcons}
+                columns={columns}
+                data={rows}
+                title="Previsualizacion de Archivo CSV"
+                localization={{
+                  toolbar: {
+                    nRowsSelected: '{0} filas(s) seleccionadas',
+                    searchPlaceholder: 'Buscar',
+                  },
+                  header: {
+                    actions: 'Acciones',
+                  },
+                  body: {
+                    emptyDataSourceMessage: 'Sin registros para mostrar',
+                    filterRow: {
+                      filterTooltip: 'Filtrar',
+                    },
+                  },
+                  pagination: {
+                    labelRowsSelect: 'filas',
+                    labelDisplayedRows: '{count} de {from}-{to}',
+                    firstTooltip: 'Primera página',
+                    previousTooltip: 'Página anterior',
+                    nextTooltip: 'Próxima página',
+                    lastTooltip: 'Última página',
+                  },
+                }}
+                fullWidth
+                options={{
+                  selection: false,
+                }}
+              />
+            </Box>
+          )}
+          {openModalTest && (
+            <Box py={3} style={{ maxWidth: '100%' }}>
+              <MaterialTable
+                icons={tableIcons}
+                columns={columns}
+                data={rowsTest}
+                title="Previsualizacion de Archivo CSV para Test"
+                localization={{
+                  toolbar: {
+                    nRowsSelected: '{0} filas(s) seleccionadas',
+                    searchPlaceholder: 'Buscar',
+                  },
+                  header: {
+                    actions: 'Acciones',
+                  },
+                  body: {
+                    emptyDataSourceMessage: 'Sin registros para mostrar',
+                    filterRow: {
+                      filterTooltip: 'Filtrar',
+                    },
+                  },
+                  pagination: {
+                    labelRowsSelect: 'filas',
+                    labelDisplayedRows: '{count} de {from}-{to}',
+                    firstTooltip: 'Primera página',
+                    previousTooltip: 'Página anterior',
+                    nextTooltip: 'Próxima página',
+                    lastTooltip: 'Última página',
+                  },
+                }}
+                fullWidth
+                options={{
+                  selection: false,
+                }}
+              />
+            </Box>
+          )}
         </Container>
       ) : (
         <>
@@ -149,7 +296,8 @@ const App = () => {
                   setPage1(true);
                   setArchivoCSV(null);
                   setArchivoCSVtest(null);
-                  setUmbral(0);
+                  setResultados([])
+                  setResultadosTG([])
                 }}>
                 Regresar al menú principal
               </Button>
@@ -203,11 +351,12 @@ const App = () => {
               <Button
                 style={{ backgroundColor: '#C0D4F0' }}
                 variant="contained"
+                disabled={!archivoCSVtest}
                 onClick={toggleModal}>
                 Testear
               </Button>
             </Box>
-            <Box px={2}>
+            <Box px={2} py={4}>
               <Button
                 style={{ backgroundColor: '#C0D4F0' }}
                 variant="contained"
@@ -258,7 +407,6 @@ const App = () => {
               )}
             </Grid>
           </Grid>
-
           <Dialog open={openModal} setIsOpen={toggleModal} aria-labelledby="form-dialog-title">
             <DialogContent>
               <Box display="flex" justifyContent="flex-end">
@@ -289,12 +437,28 @@ const App = () => {
                 />
               </Box>
               <Box display="flex" alignItems="center" justifyContent="center" mt={5}>
-                <Button onClick={toggleModal}>Salir</Button>
+                <Button variant="contained" color="primary" onClick={toggleModal}>
+                  Salir
+                </Button>
+              </Box>
+            </DialogContent>
+          </Dialog>
+          <Dialog open={openModalHelp} setIsOpen={toggleModalHelp} aria-labelledby="form-dialog-title">
+            <DialogContent>
+              <Box display="flex" justifyContent="flex-end">
+                <CloseIcon className={classes.closeIcon} onClick={toggleModalHelp} />
+              </Box>
+              {displayHelp()}
+              <Box display="flex" alignItems="center" justifyContent="center" mt={5}>
+                <Button variant="contained" color="primary" onClick={toggleModalHelp}>
+                  Salir
+                </Button>
               </Box>
             </DialogContent>
           </Dialog>
         </>
       )}
+      {/* <Footer /> */}
     </>
   );
 };
