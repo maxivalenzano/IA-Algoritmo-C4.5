@@ -499,6 +499,10 @@ let caminosPosibles = [];
 let noClasifican = [];
 let correctos = [];
 let fallidos = [];
+let caminosPosiblesTG = [];
+let noClasificanTG = [];
+let correctosTG = [];
+let fallidosTG = [];
 
 export const formatearDatosTest = (datos) => {
   if (datos.length === 0) {
@@ -609,11 +613,11 @@ export const testearFilas = (caminosPosibles, dataSet) => {
       });
       // console.log('🚀 ~ file: funciones.js ~ line 594 ~ result3 ~ result3', result3);
       if (incorrecto) {
-        console.log('🚀 ~🚀 ~🚀 ~🚀 ~🚀 ~🚀 ~🚀 ~🚀 ~🚀 ~', {
-        validaciones: result3,
-        posibleIncorrecto: row,
-        camino: camino,
-      });
+      //   console.log('🚀 ~🚀 ~🚀 ~🚀 ~🚀 ~🚀 ~🚀 ~🚀 ~🚀 ~', {
+      //   validaciones: result3,
+      //   posibleIncorrecto: row,
+      //   camino: camino,
+      // });
       noClasifican.push(row)
     } 
       return !result3.includes(false);
@@ -632,6 +636,140 @@ export const testearFilas = (caminosPosibles, dataSet) => {
   // console.log("🚀 ~ file: funciones.js ~ line 558 ~ testearFilas ~ result", result);
   return result;
 };
+
+export const formatearDatosTestTG = (datos) => {
+  if (datos.length === 0) {
+    return [];
+  }
+  return {
+    name: datos[0].nodo,
+    children: datos.map((nodo) => {
+      const attributeName = nodo.nodo;
+      const nameNodo = nodo.ramas[0]?.nodo
+        ? nodo.ramas[0]?.nodo
+        : nodo.nodoPuro?.nodoPuro?.campoClase
+        ? nodo.nodoPuro.nodoPuro?.campoClase
+        : "NodoImpuro";
+        if (nodo.ramas.length === 0) {
+          if (nameNodo !== 'NodoImpuro') {
+            caminosPosiblesTG.push({
+              ...datos.obj,
+              [attributeName]: nodo.valorAtributo.campo,
+              [nodo.nodoPuro.clase]: nameNodo,
+            });
+          } else {
+            caminosPosiblesTG.push({
+              ...datos.obj,
+              [attributeName]: nodo.valorAtributo.campo,
+              [nodo.nodoPuro.clase]: nameNodo,
+            });
+          }
+        }
+      return nodo.ramas.length === 0
+        ? {
+            name: nameNodo,
+            attributes: nodo.valorAtributo.campo,
+            obj: { [attributeName]: nodo.valorAtributo.campo, [nodo.nodoPuro.clase]: nameNodo },
+          }
+        : {
+            name: nameNodo,
+            attributes: nodo.valorAtributo.campo,
+            obj: { [attributeName]: nodo.valorAtributo.campo },
+            children: auxFormateoDatosTestTG({
+              datos: nodo.ramas,
+              obj: { [attributeName]: nodo.valorAtributo.campo },
+            }),
+          };
+    }),
+  };
+};
+
+export const auxFormateoDatosTestTG = (datos) => {
+  if (datos.datos.length === 0) {
+    return [];
+  }
+  return datos.datos.map((nodo) => {
+    const attributeName = nodo.nodo;
+    const nameNodo = nodo.ramas[0]?.nodo
+      ? nodo.ramas[0]?.nodo
+      : nodo.nodoPuro?.nodoPuro?.campoClase
+      ? nodo.nodoPuro.nodoPuro?.campoClase
+      : "NodoImpuro";
+      if (nodo.ramas.length === 0) {
+        if (nameNodo !== 'NodoImpuro') {
+          caminosPosiblesTG.push({
+            ...datos.obj,
+            [attributeName]: nodo.valorAtributo.campo,
+            [nodo.nodoPuro.clase]: nameNodo,
+          });
+        } else {
+          caminosPosiblesTG.push({
+            ...datos.obj,
+            [attributeName]: nodo.valorAtributo.campo,
+            [nodo.nodoPuro.clase]: nameNodo,
+          });
+        }
+      }
+    return nodo.ramas.length === 0
+      ? {
+          name: nameNodo,
+          attributes: nodo.valorAtributo.campo,
+          obj: { ...datos.obj, [attributeName]: nodo.valorAtributo.campo, [nodo.nodoPuro.clase]: nameNodo },
+        }
+      : {
+          name: nameNodo,
+          attributes: nodo.valorAtributo.campo,
+          obj: { ...datos.obj, [attributeName]: nodo.valorAtributo.campo },
+          children: auxFormateoDatosTestTG({
+            datos: nodo.ramas,
+            obj: { ...datos.obj, [attributeName]: nodo.valorAtributo.campo },
+          }),
+        };
+  });
+};
+export const testearFilasTG = (caminosPosiblesTG, dataSet) => {
+  const result = dataSet.map((row) => {
+    const result2 = caminosPosiblesTG.map((camino) => {
+      let banderaTG = true;
+      let incorrectoTG = false;
+      let countTG = 0;
+      const largo = Object.entries(camino).length;
+      const result3 = Object.entries(camino).map(([key, value]) => {
+        // value === 'NodoImpuro' && console.log('🚀 ~ file: funciones.js ~ line 585 ~ result3', (countTG), largo)
+        if (value === 'NodoImpuro' && ((countTG+1) === largo)) {
+          // console.log('🚀 ~ file: funciones.js ~ line 584', value, String(row[key]));
+          incorrectoTG = true;
+        }
+        banderaTG = (String(row[key]) === String(value));
+        banderaTG && countTG ++;
+        return String(row[key]) === String(value);
+      });
+      // console.log('🚀 ~ file: funciones.js ~ line 594 ~ result3 ~ result3', result3);
+      if (incorrectoTG) {
+      //   console.log('🚀 ~🚀 ~🚀 ~🚀 ~🚀 ~🚀 ~🚀 ~🚀 ~🚀 ~', {
+      //   validaciones: result3,
+      //   posibleIncorrecto: row,
+      //   camino: camino,
+      // });
+      noClasificanTG.push(row)
+    } 
+      return !result3.includes(false);
+    });
+    // console.log(
+    //   "🚀 ~ file: funciones.js ~ line 562 ~ result2 ~ result2",
+    //   {result2,
+    //   valor: result2.includes(true),
+    //   row}
+    // );
+    if (result2.includes(true)) {
+      correctosTG.push(row)
+    } else {fallidosTG.push(row)}
+    return result2.includes(true);
+  });
+  // console.log("🚀 ~ file: funciones.js ~ line 558 ~ testearFilas ~ result", result);
+  return result;
+};
+
 // funcion que combina el algoritmo de expansion y el formateo de salida
 export const calcularC45 = (dataSet, umbral, csvTest = [], setResultados) => {
   const data = formatearDatos(expansionAlgoritmo(dataSet, umbral));
@@ -640,7 +778,7 @@ export const calcularC45 = (dataSet, umbral, csvTest = [], setResultados) => {
   correctos = [];
   fallidos = [];
   if (csvTest) {
-    console.log('🚀 ~ file: funciones.js ~ line 557 ~ calcularC45 ~ csvTest', csvTest);
+    // console.log('🚀 ~ file: funciones.js ~ line 557 ~ calcularC45 ~ csvTest', csvTest);
     formatearDatosTest(expansionAlgoritmo(dataSet, umbral));
     const testRows = cantidadApariciones(testearFilas(caminosPosibles, csvTest));
     const aciertos = testRows.find((item) => item.campo === 'true');
@@ -674,14 +812,14 @@ export const calcularC45 = (dataSet, umbral, csvTest = [], setResultados) => {
 // funcion que combina el algoritmo de expansion y el formateo de salida
 export const calcularC45_TG = (dataSet, umbral, csvTest = [], setResultadosTG) => {
   const data = formatearDatos(expansionAlgoritmoConTG(dataSet, umbral));
-  caminosPosibles = [];
-  noClasifican = [];
-  correctos = [];
-  fallidos = [];
+  caminosPosiblesTG = [];
+  noClasificanTG = [];
+  correctosTG = [];
+  fallidosTG = [];
   if (csvTest) {
-    console.log('🚀 ~ file: funciones.js ~ line 651 ~ csvTest', csvTest);
-    formatearDatosTest(expansionAlgoritmo(dataSet, umbral));
-    const testRows = cantidadApariciones(testearFilas(caminosPosibles, csvTest));
+    // console.log('🚀 ~ file: funciones.js ~ line 651 ~ csvTest', csvTest);
+    formatearDatosTestTG(expansionAlgoritmoConTG(dataSet, umbral));
+    const testRows = cantidadApariciones(testearFilasTG(caminosPosiblesTG, csvTest));
     const aciertos = testRows.find((item) => item.campo === 'true');
     const noAciertos = testRows.find((item) => item.campo === 'false');
     const calculo = `${(aciertos?.cant / csvTest.length) * 100}%`;
@@ -698,7 +836,7 @@ export const calcularC45_TG = (dataSet, umbral, csvTest = [], setResultadosTG) =
     ]);
     return {
       graph: data,
-      caminosPosibles: caminosPosibles,
+      caminosPosibles: caminosPosiblesTG,
       testRows,
       portentajeAciertos: calculo,
       portentajeIncorrectos: calculoErrores,

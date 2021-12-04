@@ -15,7 +15,7 @@ import {
   Dialog,
 } from '@material-ui/core';
 import CloseIcon from './CloseIcon';
-import swal from '@sweetalert/with-react';
+// import swal from '@sweetalert/with-react';
 import { instanciar, displayHelp } from './funcionesInstanciar';
 import './styles.css';
 import conjuntoEntrenamiento2 from './conjuntoEntrenamiento4';
@@ -83,8 +83,6 @@ const App = () => {
   const rows = archivoCSV ? formatedRow(archivoCSV) : [];
   const rowsTest = archivoCSVtest ? formatedRow(archivoCSVtest) : [];
   const columns = formatColumns(titleColumns);
-  console.log('🚀 ~ file: App.jsx ~ line 42 ~ App ~ rows', rows);
-  console.log('🚀 ~ file: App.jsx ~ line 44 ~ App ~ columns', columns);
   const [umbral, setUmbral] = useState(0);
   const [page1, setPage1] = useState(true);
   const [viewTree1, setViewTree1] = useState(true);
@@ -296,6 +294,8 @@ const App = () => {
                   setPage1(true);
                   setArchivoCSV(null);
                   setArchivoCSVtest(null);
+                  setOpenModalTest(false);
+                  setOpenModalGrid(false);
                   setResultados([])
                   setResultadosTG([])
                 }}>
@@ -366,6 +366,8 @@ const App = () => {
                   setSeeTwoTrees(6);
                   setWidthTrees('50vw');
                   setArchivoCSVtest(null);
+                  setOpenModalTest(false);
+                  setOpenModalGrid(false);
                   instanciar(archivoCSV);
                 }}>
                 Clasificar Nueva Instancia
