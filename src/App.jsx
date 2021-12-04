@@ -18,8 +18,8 @@ import CloseIcon from './CloseIcon';
 // import swal from '@sweetalert/with-react';
 import { instanciar, displayHelp } from './funcionesInstanciar';
 import './styles.css';
-import conjuntoEntrenamiento2 from './conjuntoEntrenamiento4';
-import conjuntoTest from './conjuntoTest';
+// import conjuntoEntrenamiento2 from './conjuntoEntrenamiento4';
+// import conjuntoTest from './conjuntoTest';
 import { listadoTituloColumnas, formatColumns, formatedRow } from './funciones';
 
 import MaterialTable from 'material-table';
@@ -77,8 +77,8 @@ const useStyles = makeStyles(() => ({
 
 const App = () => {
   const classes = useStyles();
-  const [archivoCSV, setArchivoCSV] = useState(conjuntoEntrenamiento2);
-  const [archivoCSVtest, setArchivoCSVtest] = useState(conjuntoTest);
+  const [archivoCSV, setArchivoCSV] = useState(null);
+  const [archivoCSVtest, setArchivoCSVtest] = useState(null);
   const titleColumns = archivoCSV ? listadoTituloColumnas(archivoCSV) : [];
   const rows = archivoCSV ? formatedRow(archivoCSV) : [];
   const rowsTest = archivoCSVtest ? formatedRow(archivoCSVtest) : [];
