@@ -2,7 +2,6 @@ import React from 'react';
 import { Box, Button } from '@material-ui/core';
 import swal from '@sweetalert/with-react';
 import './styles.css';
-import { listadoTituloColumnas, listadoValoresColumna } from './funciones';
 
 //Función que renderiza el boton de cargar los datos
 function BotonCargar({ umbral, archivoCSV, setPage1 }) {

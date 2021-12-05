@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { calcularC45_TG } from './funciones';
+import { calcularC45_TG, posicionClase } from './funciones';
 import Tree from 'react-d3-tree';
 import { useCenteredTree, renderRectSvgNode } from './useCenteredTree';
 import swal from '@sweetalert/with-react';
 import './styles.css';
+import DialogInstancia from "./DialogInstancia"
 
-const DecisionTree = ({ csv, umbral = 0, width, height, csvTest, setResultadosTG }) => {
+const DecisionTree = ({ csv, umbral = 0, width, height, csvTest, setResultadosTG, openModalClasificador, toggleModalClasificador }) => {
   const containerStyles = {
     width: width,
     height: height,
   };
   const [translate, containerRef] = useCenteredTree();
-  const [jsonValuesC45TG, setJsonValuesC45TG] = useState({ test: {}, graph: {} });
+  const [jsonValuesC45TG, setJsonValuesC45TG] = useState({ test: {}, graph: {}, caminosPosibles: {} });
   console.log('🚀 ~ file: DecisionTreeTG.jsx ~ line 15 ~ DecisionTree ~ jsonValuesC45TG', jsonValuesC45TG);
   useEffect(() => {
     setJsonValuesC45TG(calcularC45_TG(csv, umbral, csvTest, setResultadosTG));
@@ -81,6 +82,14 @@ const DecisionTree = ({ csv, umbral = 0, width, height, csvTest, setResultadosTG
             renderRectSvgNode({ ...rd3tProps, handleNodeClick, handleRamaClick })
           }
           orientation="vertical"
+        />
+        <DialogInstancia
+          caminos={jsonValuesC45TG.caminosPosibles}
+          clase={posicionClase(csv)}
+          archivoCSV={csv}
+          openModalClasificador={openModalClasificador}
+          toggleModalClasificador={toggleModalClasificador}
+          title="Árbol con Tasa de Ganancia"
         />
       </div>
     </React.Fragment>

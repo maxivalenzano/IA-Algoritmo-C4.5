@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, forwardRef } from 'react';
 import CSVReader from 'react-csv-reader';
 import { Chart } from 'react-google-charts';
 import BotonCargar from './boton';
@@ -6,24 +6,22 @@ import DecisionTree from './DecisionTree';
 import DecisionTreeTG from './DecisionTreeTG';
 import {
   Box,
-  Container,
   Button,
-  Typography,
-  Grid,
-  DialogContent,
-  makeStyles,
+  Container,
   Dialog,
+  DialogContent,
+  Grid,
+  Typography,
+  makeStyles,
 } from '@material-ui/core';
-import CloseIcon from './CloseIcon';
-// import swal from '@sweetalert/with-react';
-import { instanciar, displayHelp } from './funcionesInstanciar';
 import './styles.css';
-// import conjuntoEntrenamiento2 from './conjuntoEntrenamiento4';
-// import conjuntoTest from './conjuntoTest';
+import CloseIcon from './CloseIcon';
+import conjuntoEntrenamiento2 from './conjuntoEntrenamiento4';
+import conjuntoTest from './conjuntoTest';
+import { displayHelp } from './funcionesInstanciar';
 import { listadoTituloColumnas, formatColumns, formatedRow } from './funciones';
 
 import MaterialTable from 'material-table';
-import { forwardRef } from 'react';
 import AddBox from '@material-ui/icons/AddBox';
 import ArrowDownward from '@material-ui/icons/ArrowDownward';
 import Check from '@material-ui/icons/Check';
@@ -77,8 +75,8 @@ const useStyles = makeStyles(() => ({
 
 const App = () => {
   const classes = useStyles();
-  const [archivoCSV, setArchivoCSV] = useState(null);
-  const [archivoCSVtest, setArchivoCSVtest] = useState(null);
+  const [archivoCSV, setArchivoCSV] = useState(conjuntoEntrenamiento2);
+  const [archivoCSVtest, setArchivoCSVtest] = useState(conjuntoTest);
   const titleColumns = archivoCSV ? listadoTituloColumnas(archivoCSV) : [];
   const rows = archivoCSV ? formatedRow(archivoCSV) : [];
   const rowsTest = archivoCSVtest ? formatedRow(archivoCSVtest) : [];
@@ -95,6 +93,16 @@ const App = () => {
   const [openModalGrid, setOpenModalGrid] = useState(false);
   const [openModalTest, setOpenModalTest] = useState(false);
   const [openModalHelp, setOpenModalHelp] = useState(false);
+  const [openModalClasificador, setOpenModalClasificador] = useState(false);
+  const [openModalClasificadorTG, setOpenModalClasificadorTG] = useState(false);
+
+  function toggleModalClasificadorTG() {
+    setOpenModalClasificadorTG(!openModalClasificadorTG);
+  }
+
+  function toggleModalClasificador() {
+    setOpenModalClasificador(!openModalClasificador);
+  }
 
   function toggleModalHelp() {
     setOpenModalHelp(!openModalHelp);
@@ -115,7 +123,7 @@ const App = () => {
     setArchivoCSVtest(data);
   };
   function displayH() {
-    toggleModalHelp()
+    toggleModalHelp();
   }
 
   const papaparseOptions = {
@@ -173,7 +181,7 @@ const App = () => {
             </Grid>
           </Grid>
           <Box pt={6} pb={2} display="flex" justifyContent="center">
-            <Box px={2}>
+            <Box px={1}>
               <BotonCargar archivoCSV={archivoCSV} umbral={umbral} setPage1={setPage1} />
             </Box>
             <Box px={2} align="center">
@@ -228,6 +236,7 @@ const App = () => {
                 fullWidth
                 options={{
                   selection: false,
+                  filtering: true,
                 }}
               />
             </Box>
@@ -265,6 +274,7 @@ const App = () => {
                 fullWidth
                 options={{
                   selection: false,
+                  filtering: true,
                 }}
               />
             </Box>
@@ -276,7 +286,7 @@ const App = () => {
             <Typography variant="h4">Análisis Comparativo - Árboles de decisión</Typography>
           </Box>
           <Box pb={2} px={'10vw'} display="flex" justifyContent="center">
-            <Box px={2}>
+            <Box px={1}>
               <Button
                 style={{ backgroundColor: '#C0D4F0' }}
                 variant="contained"
@@ -286,7 +296,7 @@ const App = () => {
                 Ayuda
               </Button>
             </Box>
-            <Box px={2}>
+            <Box px={1}>
               <Button
                 style={{ backgroundColor: '#C0D4F0' }}
                 variant="contained"
@@ -296,13 +306,15 @@ const App = () => {
                   setArchivoCSVtest(null);
                   setOpenModalTest(false);
                   setOpenModalGrid(false);
-                  setResultados([])
-                  setResultadosTG([])
+                  setOpenModalClasificador(false);
+                  setOpenModalClasificadorTG(false);
+                  setResultados([]);
+                  setResultadosTG([]);
                 }}>
                 Regresar al menú principal
               </Button>
             </Box>
-            <Box px={2}>
+            <Box px={1}>
               <Button
                 style={{
                   backgroundColor:
@@ -312,6 +324,7 @@ const App = () => {
                 onClick={() => {
                   setViewTree1(true);
                   setViewTree2(false);
+                  setOpenModalClasificadorTG(false);
                   setSeeTwoTrees(12);
                   setWidthTrees('100vw');
                 }}>
@@ -328,13 +341,14 @@ const App = () => {
                 onClick={() => {
                   setViewTree1(false);
                   setViewTree2(true);
+                  setOpenModalClasificador(false);
                   setSeeTwoTrees(12);
                   setWidthTrees('100vw');
                 }}>
                 Árbol con Tasa Ganancia
               </Button>
             </Box>
-            <Box px={2}>
+            <Box px={1}>
               <Button
                 style={{ backgroundColor: viewTree1 && viewTree2 ? '#F0CCE3' : '#C0D4F0' }}
                 variant="contained"
@@ -347,30 +361,34 @@ const App = () => {
                 Mostrar ambos
               </Button>
             </Box>
-            <Box px={2}>
+          </Box>
+
+          <Box pb={2} px={'10vw'} display="flex" justifyContent="center">
+            <Box px={1}>
               <Button
                 style={{ backgroundColor: '#C0D4F0' }}
                 variant="contained"
                 disabled={!archivoCSVtest}
                 onClick={toggleModal}>
-                Testear
+                Resultado Test
               </Button>
             </Box>
-            <Box px={2} py={4}>
+            <Box px={1}>
               <Button
                 style={{ backgroundColor: '#C0D4F0' }}
                 variant="contained"
-                onClick={() => {
-                  setViewTree1(true);
-                  setViewTree2(true);
-                  setSeeTwoTrees(6);
-                  setWidthTrees('50vw');
-                  setArchivoCSVtest(null);
-                  setOpenModalTest(false);
-                  setOpenModalGrid(false);
-                  instanciar(archivoCSV);
-                }}>
-                Clasificar Nueva Instancia
+                disabled={!viewTree1}
+                onClick={() => toggleModalClasificador()}>
+                Clasificar Instancia con Ganancia
+              </Button>
+            </Box>
+            <Box px={1}>
+              <Button
+                style={{ backgroundColor: '#C0D4F0' }}
+                disabled={!viewTree2}
+                variant="contained"
+                onClick={() => toggleModalClasificadorTG()}>
+                Clasificar Instancia con Tasa de Ganancia
               </Button>
             </Box>
           </Box>
@@ -389,6 +407,8 @@ const App = () => {
                     width={widthTrees}
                     resultados={resultados}
                     setResultados={setResultados}
+                    openModalClasificador={openModalClasificador}
+                    toggleModalClasificador={toggleModalClasificador}
                   />
                 </Box>
               )}
@@ -404,6 +424,8 @@ const App = () => {
                     height={'100vh'}
                     width={widthTrees}
                     setResultadosTG={setResultadosTG}
+                    openModalClasificador={openModalClasificadorTG}
+                    toggleModalClasificador={toggleModalClasificadorTG}
                   />
                 </Box>
               )}
@@ -419,10 +441,11 @@ const App = () => {
                   width={'500px'}
                   height={'300px'}
                   chartType="PieChart"
-                  loader={<div>Loading Chart...</div>}
+                  loader={<div>Cargando Gráfico...</div>}
                   data={resultados}
                   options={{
                     title: 'Resultados de la prueba con Ganancia',
+                    is3D: true,
                   }}
                   rootProps={{ 'data-testid': '1' }}
                 />
@@ -430,29 +453,33 @@ const App = () => {
                   width={'500px'}
                   height={'300px'}
                   chartType="PieChart"
-                  loader={<div>Loading Chart2...</div>}
+                  loader={<div>Cargando Gráfico...</div>}
                   data={resultadosTG}
                   options={{
                     title: 'Resultados de la prueba con Tasa de Ganancia',
+                    is3D: true,
                   }}
                   rootProps={{ 'data-testid': '1' }}
                 />
               </Box>
               <Box display="flex" alignItems="center" justifyContent="center" mt={5}>
-                <Button variant="contained" color="primary" onClick={toggleModal}>
+                <Button variant="contained" style={{ backgroundColor: '#F0CCE3' }} onClick={toggleModal}>
                   Salir
                 </Button>
               </Box>
             </DialogContent>
           </Dialog>
-          <Dialog open={openModalHelp} setIsOpen={toggleModalHelp} aria-labelledby="form-dialog-title">
+          <Dialog
+            open={openModalHelp}
+            setIsOpen={toggleModalHelp}
+            aria-labelledby="form-dialog-title">
             <DialogContent>
               <Box display="flex" justifyContent="flex-end">
                 <CloseIcon className={classes.closeIcon} onClick={toggleModalHelp} />
               </Box>
               {displayHelp()}
               <Box display="flex" alignItems="center" justifyContent="center" mt={5}>
-                <Button variant="contained" color="primary" onClick={toggleModalHelp}>
+                <Button variant="contained" style={{ backgroundColor: '#F0CCE3' }} onClick={toggleModalHelp}>
                   Salir
                 </Button>
               </Box>

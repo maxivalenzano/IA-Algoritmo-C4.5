@@ -6,7 +6,7 @@ export const listadoTituloColumnas = (datos) => {
 
 export const formatColumns = (titles) => {
   let result = titles.map((column) => {
-    return { field: column, title: column, sorting: true, }
+    return { field: column, title: column, sorting: true, filtering: true, }
   })
   result.push({ field: 'id', title: 'id', hidden: true })
   return result
@@ -16,6 +16,17 @@ export const formatedRow = (csv) => {
   return csv.map((item, index) => {
     return {...item, id: index}
   })
+}
+
+export const atributos = (data) => {
+  let opcionesAtributosAux = [];
+  //atributos, o sea los nombres
+  for (let i = 0; i < listadoTituloColumnas(data).length - 1; i++) {
+    let opciones = listadoValoresColumna(data, listadoTituloColumnas(data).at(i));
+    let result = opciones.filter((item, index) => opciones.indexOf(item) === index);
+    opcionesAtributosAux.push(result);
+  }
+  return opcionesAtributosAux
 }
 
 // devuelve el nombre de la clase (ultima fila)
@@ -777,9 +788,9 @@ export const calcularC45 = (dataSet, umbral, csvTest = [], setResultados) => {
   noClasifican = [];
   correctos = [];
   fallidos = [];
+  formatearDatosTest(expansionAlgoritmo(dataSet, umbral));
   if (csvTest) {
     // console.log('🚀 ~ file: funciones.js ~ line 557 ~ calcularC45 ~ csvTest', csvTest);
-    formatearDatosTest(expansionAlgoritmo(dataSet, umbral));
     const testRows = cantidadApariciones(testearFilas(caminosPosibles, csvTest));
     const aciertos = testRows.find((item) => item.campo === 'true');
     const noAciertos = testRows.find((item) => item.campo === 'false');
@@ -805,7 +816,7 @@ export const calcularC45 = (dataSet, umbral, csvTest = [], setResultados) => {
       row: { incorrectos: diferencia, aciertos: correctos, noClasifican },
     };
   } else {
-    return { graph: data };
+    return { graph: data, caminosPosibles: caminosPosibles };
   }
 };
 
@@ -816,9 +827,9 @@ export const calcularC45_TG = (dataSet, umbral, csvTest = [], setResultadosTG) =
   noClasificanTG = [];
   correctosTG = [];
   fallidosTG = [];
+  formatearDatosTestTG(expansionAlgoritmoConTG(dataSet, umbral));
   if (csvTest) {
     // console.log('🚀 ~ file: funciones.js ~ line 651 ~ csvTest', csvTest);
-    formatearDatosTestTG(expansionAlgoritmoConTG(dataSet, umbral));
     const testRows = cantidadApariciones(testearFilasTG(caminosPosiblesTG, csvTest));
     const aciertos = testRows.find((item) => item.campo === 'true');
     const noAciertos = testRows.find((item) => item.campo === 'false');
@@ -844,6 +855,6 @@ export const calcularC45_TG = (dataSet, umbral, csvTest = [], setResultadosTG) =
       row: { incorrectos: diferencia, aciertos: correctos, noClasifican },
     };
   } else {
-    return { graph: data };
+    return { graph: data, caminosPosibles: caminosPosiblesTG };
   }
 };

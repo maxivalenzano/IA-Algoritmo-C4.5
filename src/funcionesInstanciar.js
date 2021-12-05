@@ -1,51 +1,11 @@
-import { listadoTituloColumnas, listadoValoresColumna } from "./funciones";
-import swal from "@sweetalert/with-react";
+import { atributos } from './funciones';
+import Instancia from './Instancia';
 
 //exporta la función instanciar
 export const instanciar = (data) => {
-  atributos(data);
-  swal(form(data));
+  const opcionesAtributos = atributos(data);
+  return <Instancia data={data} opcionesAtributos={opcionesAtributos}/>
 };
-
-var opcionesAtributos = [];
-//arma el arreglo de arreglos => cada posición sería el nombre del atributo con sus posibles valores
-function atributos(data) {
-  //atributos, o sea los nombres
-  //console.log(listadoTituloColumnas(data).slice(0,-1))
-  //console.log(listadoTituloColumnas(data).pop())
-  //console.log(listadoTituloColumnas(data).length-1)
-
-  for (let i = 0; i < listadoTituloColumnas(data).length - 1; i++) {
-    var opciones = listadoValoresColumna(data, listadoTituloColumnas(data).at(i));
-    var result = opciones.filter((item, index) => opciones.indexOf(item) === index);
-    opcionesAtributos.push(result);
-  }
-}
-//exporta la función del popup del formulario para una nueva instancia
-function form(data) {
-  var listaAtributos = listadoTituloColumnas(data).slice(0, -1);
-
-  return (
-    <div>
-      <form>
-        {listaAtributos.map(function (e, i) {
-          return (
-            <div>
-              <label>{e + ":"}</label>
-
-              <select>
-                {opcionesAtributos[i].map((selectData) => {
-                  return <option value={i}>{selectData}</option>;
-                })}
-              </select>
-            </div>
-          );
-        })}
-      </form>
-      <h5>{listadoTituloColumnas(data).pop()}</h5>
-    </div>
-  );
-}
 
 function displayHelp() {
   return (
@@ -76,14 +36,17 @@ function displayHelp() {
           <em>Mostrar ambos</em>: se mostrarán los árboles con ambas medidas
         </li>
         <li>
-          <em>Testear</em>: esta opción le permitirá testear, en caso de que haya ingresado el dataset
-          correspondiente, los datos del csv de prueba. Una vez clickeada esta acción, se le abrirá una
-          ventana, la cual mostrará los datos correspondientes al testeo realizado
+          <em>Resultados Test</em>: esta opción le permitirá ver el resultado del testeo, en caso de que haya ingresado el dataset
+          correspondiente, es decir, el csv de prueba. Una vez clickeada esta acción, se le abrirá una
+          ventana, la cual mostrará los datos en dos gráficos: uno corresponderá al resultado utilizando la ganancia de información y el otro a la tasa de ganancia de información
         </li>
         <li>
-          <em>Ingresar una nueva instancia</em>: al dar click sobre esta opción, se le abrirá una nueva
-          ventana para ingresar los datos de la nueva instancia a probar. Luego de cargar los datos, presione
-          el botón ok y le aparecerá la clasificación pertinente a esta instancia.
+          <em>Clasificar instancia con ganancia</em>: al dar click sobre esta opción, se le abrirá una nueva
+          ventana para ingresar los datos de una instancia a probar con la medida de ganancia de información y poder conocer la clasificación pertinente.
+        </li>
+        <li>
+          <em>Clasificar instancia con tasa de ganancia</em>: al dar click sobre esta opción, se le abrirá una nueva
+          ventana para ingresar los datos de una instancia a probar con la medida de tasa de ganancia de información y poder conocer la clasificación pertinente.
         </li>
       </ul>
       <p>
@@ -117,4 +80,4 @@ function displayHelp() {
   );
 }
 
-export { displayHelp, form };
+export { displayHelp };
