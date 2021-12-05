@@ -16,8 +16,6 @@ import {
 } from '@material-ui/core';
 import './styles.css';
 import CloseIcon from './CloseIcon';
-import conjuntoEntrenamiento2 from './conjuntoEntrenamiento4';
-import conjuntoTest from './conjuntoTest';
 import { displayHelp } from './funcionesInstanciar';
 import { listadoTituloColumnas, formatColumns, formatedRow } from './funciones';
 
@@ -80,8 +78,8 @@ const useStyles = makeStyles(() => ({
 
 const App = () => {
   const classes = useStyles();
-  const [archivoCSV, setArchivoCSV] = useState(conjuntoEntrenamiento2);
-  const [archivoCSVtest, setArchivoCSVtest] = useState(conjuntoTest);
+  const [archivoCSV, setArchivoCSV] = useState(null);
+  const [archivoCSVtest, setArchivoCSVtest] = useState(null);
   const titleColumns = archivoCSV ? listadoTituloColumnas(archivoCSV) : [];
   const rows = archivoCSV ? formatedRow(archivoCSV) : [];
   const rowsTest = archivoCSVtest ? formatedRow(archivoCSVtest) : [];
