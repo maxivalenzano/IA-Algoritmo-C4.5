@@ -58,12 +58,6 @@ const tableIcons = {
   ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />),
 };
 
-//Crea el footer de la página principal
-// const Footer = () => (
-//   <footer className="footer">
-//     <p>Inteligencia Artificial - Grupo 10</p>
-//   </footer>
-// );
 
 const useStyles = makeStyles(() => ({
   closeIcon: {
@@ -71,6 +65,19 @@ const useStyles = makeStyles(() => ({
     height: '28px',
     cursor: 'pointer',
   },
+  footer: {
+    backgroundColor: 'black',
+    bottom: '0',
+    width: '100%',
+    height: '50px',
+    color: 'white',
+    textAlign: 'center',
+    paddingTop: '15px',
+    left: '0px'
+  },
+  container: {
+    minHeight: '94vh'
+  }
 }));
 
 const App = () => {
@@ -95,15 +102,13 @@ const App = () => {
   const [openModalHelp, setOpenModalHelp] = useState(false);
   const [openModalClasificador, setOpenModalClasificador] = useState(false);
   const [openModalClasificadorTG, setOpenModalClasificadorTG] = useState(false);
-
+  
   function toggleModalClasificadorTG() {
     setOpenModalClasificadorTG(!openModalClasificadorTG);
   }
-
   function toggleModalClasificador() {
     setOpenModalClasificador(!openModalClasificador);
   }
-
   function toggleModalHelp() {
     setOpenModalHelp(!openModalHelp);
   }
@@ -125,7 +130,13 @@ const App = () => {
   function displayH() {
     toggleModalHelp();
   }
-
+  
+  // Crea el footer de la página principal
+  const Footer = () => (
+    <footer className={classes.footer}>
+      <p>Inteligencia Artificial - Grupo 10</p>
+    </footer>
+  );
   const papaparseOptions = {
     header: true,
     dynamicTyping: true,
@@ -135,7 +146,7 @@ const App = () => {
   return (
     <>
       {page1 ? (
-        <Container>
+        <Container className={classes.container}>
           <p className="f1">Análisis Comparativo - Árboles de decisión</p>
           <Grid container justifyContent="center" alignItems="center" spacing={2}>
             <Grid item>
@@ -487,7 +498,7 @@ const App = () => {
           </Dialog>
         </>
       )}
-      {/* <Footer /> */}
+      <Footer />
     </>
   );
 };
