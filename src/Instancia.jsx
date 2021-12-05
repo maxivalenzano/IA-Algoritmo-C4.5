@@ -32,7 +32,7 @@ const Instancia = ({ data, opcionesAtributos, caminos, clase, title }) => {
   };
 
   return (
-    <Box minWidth={300} px={6}>
+    <Box minWidth={500} px={6}>
       <h4>{title}</h4>
       <h5>Nueva instancia</h5>
       <br/>
