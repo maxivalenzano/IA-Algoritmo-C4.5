@@ -67,13 +67,11 @@ const useStyles = makeStyles(() => ({
   },
   footer: {
     backgroundColor: 'black',
-    bottom: '0',
     width: '100%',
     height: '50px',
     color: 'white',
     textAlign: 'center',
     paddingTop: '15px',
-    left: '0px'
   },
   container: {
     minHeight: '94vh'
